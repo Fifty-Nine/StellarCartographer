@@ -21,6 +21,13 @@ public:
 
     std::string getName() const { return name_; }
     Coordinate getCoords() const { return coords_; }
+
+    bool operator==(const Star& s) const
+    { 
+        return 
+            name_ == s.name_ &&
+            coords_ == s.coords_;
+    }
 };
 
 }
