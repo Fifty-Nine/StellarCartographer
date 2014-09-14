@@ -1,11 +1,14 @@
 #include "StellarCartography/NeighborMap.h"
 
+#include <algorithm>
 #include <cmath>
 
 using namespace StellarCartography;
 
+#define sq(x) ((x)*(x))
+
 NeighborMap::NeighborMap(double threshold) : 
-    t2_(threshold * threshold)
+    t2_(sq(threshold))
 {
 }
 
@@ -30,34 +33,35 @@ void NeighborMap::add(const Star& s)
 StarSet
 NeighborMap::neighbors(const Star& star, double threshold) const
 {
-    checkThreshold(threshold);
-    return { };
+    double t2 = checkThreshold(threshold);
+    auto nearby = get(star);
+
+    StarSet result;
+    std::transform(
+        nearby.begin(),
+        nearby.upper_bound(t2),
+        inserter(result, result.begin()),
+        [](const MapEntry& e) { return e.second; }
+    );
+    return result;
 }
 
 Star 
 NeighborMap::nearestNeighbor(const Star& star, double threshold) const
 {
-    checkThreshold(threshold);
+    double t2 = checkThreshold(threshold);
+    auto nearby = get(star);
 
-    auto it = nodes_.find(star);
-    if (it == nodes_.end())
-    {
-        throw std::invalid_argument("star");
-    }
-
-    auto nearby = it->second;
     if (nearby.size() == 0) { return Star(); }
 
     auto nearest = nearby.begin();
-    double t2 = threshold * threshold;
 
     return (nearest->first < t2) ? nearest->second : Star();
 }
 
-void NeighborMap::checkThreshold(double threshold) const
+double NeighborMap::checkThreshold(double threshold) const
 {
-    auto t2 = threshold;
-    t2 *= t2;
+    auto t2 = sq(threshold);
 
     if (isnan(threshold))
     {
@@ -71,4 +75,17 @@ void NeighborMap::checkThreshold(double threshold) const
     {
         throw std::out_of_range("threshold too large");
     }
+
+    return t2;
+}
+
+NeighborMap::DistanceMap NeighborMap::get(const Star& star) const
+{
+    auto it = nodes_.find(star);
+    if (it == nodes_.end())
+    {
+        throw std::invalid_argument("star");
+    }
+
+    return it->second;
 }

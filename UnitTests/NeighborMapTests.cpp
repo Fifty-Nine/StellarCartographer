@@ -28,7 +28,7 @@ SC_TEST_CASE(NeighborMapTests, TestBasic)
     nm.add(h);
 
     BOOST_CHECK_EQUAL(
-        (StarSet { b, c }),
+        (StarSet { b, c, h }),
         nm.neighbors(a, 10.0)
     );
 
@@ -36,7 +36,7 @@ SC_TEST_CASE(NeighborMapTests, TestBasic)
 
     BOOST_CHECK_EQUAL(
         StarSet(),
-        nm.neighbors(a, 1.0)
+        nm.neighbors(a, 0.9)
     );
 
     BOOST_CHECK_EQUAL(
