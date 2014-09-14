@@ -15,14 +15,19 @@ class Coordinate;
 
 class SpatialIndex
 {
-    std::map<std::string, Star> names;
+    typedef std::map<std::string, Star> NameMap;
+    typedef NameMap::value_type NameEntry;
+    typedef std::map<double, NeighborMap> LookupTable;
+    typedef LookupTable::value_type LookupEntry;
+    NameMap names;
+    mutable LookupTable maps;
+
+    NeighborMap getNeighborMap(double t, double tolerance = 0.5) const;
 
 public:
     SpatialIndex();
 
     void insert(const Star& s);
-    bool contains(const Star& s) const;
-    size_t size() const;
 
     Star nearestNeighbor(const std::string& name, double threshold) const;
     Star nearestNeighbor(const Star& star, double threshold) const;

@@ -6,18 +6,33 @@ SpatialIndex::SpatialIndex()
 {
 }
 
+NeighborMap SpatialIndex::getNeighborMap(double t, double tolerance) const
+{
+    auto it = maps.upper_bound(t);
+
+    if (it != maps.end() &&
+        (it->first - t) >= 0.0 && (it->first - t) < tolerance)
+    {
+        return it->second;
+    }
+
+    NeighborMap result(t);
+    
+    for (auto kv : names)
+    {
+        result.add(kv.second);
+    }
+    maps.emplace(t, std::move(result));
+    return result;
+}
+
 void SpatialIndex::insert(const Star& s)
-{
-}
-
-bool SpatialIndex::contains(const Star& s) const
-{
-    return false;
-}
-
-size_t SpatialIndex::size() const
-{
-    return 0;
+{ 
+    for (auto kv : maps)
+    {
+        kv.second.add(s);
+    }
+    names.emplace(s.getName(), std::move(s));
 }
 
 Star
