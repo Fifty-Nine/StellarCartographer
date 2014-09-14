@@ -7,48 +7,47 @@ using namespace StellarCartography;
 
 SC_TEST_SUITE(NeighborMapTests)
 
-bool contains(const std::string& name, const StarSet& l)
-{
-    return std::find_if(
-        l.begin(), l.end(),
-        [name](const Star& s)
-        {
-            return s.getName() == name;
-        }
-    ) != l.end();
-}
-
 SC_TEST_CASE(NeighborMapTests, TestBasic)
 {
     NeighborMap nm(10.0);
-    nm.add({ "A", {   0,   0,   0 } });
-    nm.add({ "B", {   1,   1,   1 } });
-    nm.add({ "C", {  -1,  -1,  -1 } });
-    nm.add({ "D", {  10,  10,  10 } });
-    nm.add({ "E", { -10, -10, -10 } });
-    nm.add({ "F", {  -9,  -9,  -9 } });
-    nm.add({ "G", { -10, -11,  -9 } });
-    nm.add({ "H", {   1,   0,   0 } });
+    Star a = { "A", {   0,   0,   0 } };
+    Star b = { "B", {   1,   1,   1 } };
+    Star c = { "C", {  -1,  -1,  -1 } };
+    Star d = { "D", {  10,  10,  10 } };
+    Star e = { "E", { -10, -10, -10 } };
+    Star f = { "F", {  -9,  -9,  -9 } };
+    Star g = { "G", { -10, -11,  -9 } };
+    Star h = { "H", {   1,   0,   0 } };
+    nm.add(a);
+    nm.add(b);
+    nm.add(c);
+    nm.add(d);
+    nm.add(e);
+    nm.add(f);
+    nm.add(g);
+    nm.add(h);
 
-    auto neighbors = nm.neighbors("A", 10.0);
-    BOOST_CHECK_EQUAL(2, neighbors.size());
-    BOOST_CHECK(contains("B", neighbors));
-    BOOST_CHECK(contains("C", neighbors));
+    BOOST_CHECK_EQUAL(
+        (StarSet { b, c }),
+        nm.neighbors(a, 10.0)
+    );
 
-    BOOST_CHECK_THROW(nm.neighbors("A", 11.0), std::out_of_range);
+    BOOST_CHECK_THROW(nm.neighbors(a, 11.0), std::out_of_range);
 
-    neighbors = nm.neighbors("A", 1.0);
-    BOOST_CHECK_EQUAL(StarSet(), neighbors);
+    BOOST_CHECK_EQUAL(
+        StarSet(),
+        nm.neighbors(a, 1.0)
+    );
 
-    neighbors = nm.neighbors("E", 3.0);
-    BOOST_CHECK_EQUAL(2, neighbors.size());
-    BOOST_CHECK(contains("F", neighbors));
-    BOOST_CHECK(contains("G", neighbors));
+    BOOST_CHECK_EQUAL(
+        (StarSet { f, g }),
+        nm.neighbors(e, 3.0)
+    );
 
-    BOOST_CHECK_EQUAL("H", nm.nearestNeighbor("A", 5.0).getName());
-    BOOST_CHECK_EQUAL("H", nm.nearestNeighbor("A", 10.0).getName());
-    BOOST_CHECK_EQUAL(Star(), nm.nearestNeighbor("A", 0.5));
-    BOOST_CHECK_EQUAL("G", nm.nearestNeighbor("F", 10.0).getName());
+    BOOST_CHECK_EQUAL(h, nm.nearestNeighbor(a, 5.0));
+    BOOST_CHECK_EQUAL(h, nm.nearestNeighbor(a, 10.0));
+    BOOST_CHECK_EQUAL(Star(), nm.nearestNeighbor(a, 0.5));
+    BOOST_CHECK_EQUAL(g, nm.nearestNeighbor(f, 10.0));
 }
 SC_TEST_CASE_END()
 

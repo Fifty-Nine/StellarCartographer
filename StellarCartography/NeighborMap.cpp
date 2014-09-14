@@ -16,13 +16,13 @@ void NeighborMap::remove(const Star& s)
 }
 
 StarSet
-NeighborMap::neighbors(const std::string& name, double threshold) const
+NeighborMap::neighbors(const Star& star, double threshold) const
 {
     return { };
 }
 
 Star 
-NeighborMap::nearestNeighbor(const std::string& name, double threshold) const
+NeighborMap::nearestNeighbor(const Star& star, double threshold) const
 {
     return Star();
 }

@@ -12,6 +12,9 @@ namespace StellarCartography
 
 class NeighborMap
 {
+    typedef std::multimap<double, Star> DistanceMap;
+    typedef std::map<Star, DistanceMap> NeighborTable;
+
     double t2_;
     std::map<std::string, std::map<double, Star>> nodes_;
 
@@ -20,8 +23,8 @@ public:
 
     void add(const Star& s);
     void remove(const Star& s);
-    StarSet neighbors(const std::string& name, double threshold) const;
-    Star nearestNeighbor(const std::string& name, double threshold) const;
+    StarSet neighbors(const Star& name, double threshold) const;
+    Star nearestNeighbor(const Star& name, double threshold) const;
 };
 
 } /* namespace StellarCartography */
