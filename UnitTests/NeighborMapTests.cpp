@@ -47,7 +47,15 @@ SC_TEST_CASE(NeighborMapTests, TestBasic)
     BOOST_CHECK_EQUAL(h, nm.nearestNeighbor(a, 5.0));
     BOOST_CHECK_EQUAL(h, nm.nearestNeighbor(a, 10.0));
     BOOST_CHECK_EQUAL(Star(), nm.nearestNeighbor(a, 0.5));
-    BOOST_CHECK_EQUAL(g, nm.nearestNeighbor(f, 10.0));
+    BOOST_CHECK_EQUAL(e, nm.nearestNeighbor(f, 10.0));
+
+    BOOST_CHECK_THROW(nm.nearestNeighbor(Star(), 1.0), std::invalid_argument);
+    BOOST_CHECK_THROW(nm.nearestNeighbor(a, -1.0), std::domain_error);
+    BOOST_CHECK_THROW(
+        nm.nearestNeighbor(a, std::numeric_limits<double>::quiet_NaN()), 
+        std::domain_error
+    );
+    BOOST_CHECK_THROW(nm.nearestNeighbor(a, 11.0), std::out_of_range);
 }
 SC_TEST_CASE_END()
 

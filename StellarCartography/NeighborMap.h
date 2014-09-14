@@ -20,6 +20,8 @@ class NeighborMap
     double t2_;
     NeighborTable nodes_;
 
+    void checkThreshold(double t) const;
+
 public:
     NeighborMap(double threshold);
 
