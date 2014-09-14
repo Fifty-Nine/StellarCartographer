@@ -3,16 +3,17 @@
 
 #include <string>
 
+#include "StellarCartography/Coordinate.h"
+
 namespace StellarCartography
 {
-
-class Coordinate;
 
 class Star
 {
     std::string name_;
     Coordinate coords_;
 public:
+    Star() { }
     Star(const std::string& name, const Coordinate& coords) :
         name_(name), coords_(coords)
     {
