@@ -159,8 +159,8 @@ SC_TEST_CASE(SpatialIndexTests, TestConnectedComponents)
         (
             std::list<StarSet> 
             {
-                { sol(), proximaCentauri(), polaris() },
                 { alphaCentauri(), betaCanisMajoris() },
+                { sol(), proximaCentauri(), polaris() },
                 { sirius() }
             }
         ),

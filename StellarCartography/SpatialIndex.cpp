@@ -1,7 +1,7 @@
 #include "StellarCartography/SpatialIndex.h"
 
+#include <algorithm>
 #include <sstream>
-#include <vector>
 
 using namespace StellarCartography;
 
@@ -125,5 +125,27 @@ SpatialIndex::reachable(const std::string& name, double threshold) const
 std::list<StarSet> 
 SpatialIndex::connectedComponents(double threshold) const
 {
-    return { };
+    std::set<Star> q;
+    std::transform(
+        names.begin(), names.end(),
+        inserter(q, q.end()),
+        [](NameEntry kv) { return kv.second; }
+    );
+
+    std::list<StarSet> result;
+    while (!q.empty())
+    {
+        auto v = *q.begin();
+        q.erase(q.begin());
+
+        auto r = reachable(v, threshold);
+        for (auto u : r)
+        {
+            q.erase(u);
+        }
+
+        result.push_back(r);
+    }
+
+    return result;
 }
