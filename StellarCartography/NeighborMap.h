@@ -13,10 +13,12 @@ namespace StellarCartography
 class NeighborMap
 {
     typedef std::multimap<double, Star> DistanceMap;
+    typedef DistanceMap::value_type MapEntry;
     typedef std::map<Star, DistanceMap> NeighborTable;
+    typedef NeighborTable::value_type TableEntry;
 
     double t2_;
-    std::map<std::string, std::map<double, Star>> nodes_;
+    NeighborTable nodes_;
 
 public:
     NeighborMap(double threshold);
