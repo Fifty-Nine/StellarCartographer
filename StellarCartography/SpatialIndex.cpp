@@ -45,13 +45,16 @@ SpatialIndex::neighbors(const std::string& name, double threshold) const
 }
 
 StarList 
-SpatialIndex::path(const Star& star, double threshold) const
+SpatialIndex::path(const Star& from, const Star& to, double threshold) const
 {
-    return path(star.getName(), threshold);
+    return path(from.getName(), to.getName(), threshold);
 }
 
 StarList 
-SpatialIndex::path(const std::string& name, double threshold) const
+SpatialIndex::path(
+    const std::string& from, 
+    const std::string& to,
+    double threshold) const
 {
     return { };
 }

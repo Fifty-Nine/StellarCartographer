@@ -30,8 +30,14 @@ public:
     StarSet neighbors(const std::string& name, double threshold) const;
     StarSet neighbors(const Star& star, double threshold) const;
 
-    StarList path(const std::string& name, double threshold) const;
-    StarList path(const Star& star, double threshold) const;
+    StarList path(
+        const std::string& from, 
+        const std::string& to, 
+        double threshold) const;
+    StarList path(
+        const Star& from, 
+        const Star& to, 
+        double threshold) const;
 
     StarSet reachable(const std::string& name, double threshold) const;
     StarSet reachable(const Star& star, double threshold) const;
