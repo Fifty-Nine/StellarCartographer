@@ -1,6 +1,7 @@
 #include "StellarCartography/SpatialIndex.h"
 
 #include <sstream>
+#include <vector>
 
 using namespace StellarCartography;
 
@@ -65,7 +66,7 @@ SpatialIndex::nearestNeighbor(const std::string& name, double threshold) const
 StarSet 
 SpatialIndex::neighbors(const Star& star, double threshold) const
 {
-    return { }; 
+    return getNeighborMap(threshold).neighbors(star, threshold);
 }
 
 StarSet 
@@ -92,7 +93,27 @@ SpatialIndex::path(
 StarSet 
 SpatialIndex::reachable(const Star& star, double threshold) const
 {
-    return { };
+    std::vector<Star> s;
+    StarSet r;
+    s.push_back(star);
+
+    while (!s.empty())
+    {
+        auto v = s.back();
+        s.pop_back();
+
+        r.insert(v);
+
+        for (auto u : neighbors(v, threshold))
+        {
+            if (r.find(u) == r.end())
+            {
+                s.push_back(u);
+            }
+        }
+    }
+
+    return r;
 }
 
 StarSet 
