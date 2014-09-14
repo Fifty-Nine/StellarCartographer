@@ -2,6 +2,7 @@ SET(SOURCES
     Coordinate.cpp
     NeighborMap.cpp
     SpatialIndex.cpp
+    Star.cpp
 )
 
 SET(HEADERS

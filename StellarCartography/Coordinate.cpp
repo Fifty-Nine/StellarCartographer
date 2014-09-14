@@ -6,21 +6,24 @@ namespace StellarCartography
 {
 
 Coordinate::Coordinate() :
-    x_(0.0), y_(0.0), z_(0.0)
+    v { 0, 0, 0 }
 {
 }
 
 Coordinate::Coordinate(double x, double y, double z) : 
-    x_(x), y_(y), z_(z)
+    v { x, y, z }
 {
 }
 
 double Coordinate::distanceSquared(const Coordinate& o) const
 {
-    double x = x_ - o.x_;
-    double y = y_ - o.y_;
-    double z = z_ - o.z_;
-    return x*x + y*y + z*z;
+    double sum = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        double n = v[i] - o.v[i];
+        sum += n*n;
+    }
+    return sum;
 }
 
 double Coordinate::distance(const Coordinate& o) const
@@ -30,7 +33,22 @@ double Coordinate::distance(const Coordinate& o) const
 
 bool Coordinate::operator==(const Coordinate& o) const
 {
-    return x_ == o.x_ && y_ == o.y_ && z_ == o.z_;
+    return compare(o) == 0;
+}
+
+bool Coordinate::operator<(const Coordinate& o) const
+{
+    return compare(o) < 0;
+}
+
+int Coordinate::compare(const Coordinate& o) const
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        if (v[i] < o.v[i]) return -1;
+        if (v[i] > o.v[i]) return 1;
+    }
+    return 0;
 }
 
 }
