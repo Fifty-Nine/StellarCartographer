@@ -5,21 +5,6 @@
 
 using namespace StellarCartography;
 
-namespace boost {
-namespace test_tools {
-
-template<> 
-struct print_log_value<Coordinate> 
-{
-    void operator()(std::ostream& os, const Coordinate& c)
-    {
-        os << "Coord(" << c.x() << "," << c.y() << "," << c.z() << ")";
-    }
-};
-
-}
-}
-
 SC_TEST_SUITE(CoordinateTests)
 
 SC_TEST_CASE(CoordinateTests, Sanity)
