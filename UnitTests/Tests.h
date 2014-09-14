@@ -41,6 +41,13 @@ struct print_log_value<StellarCartography::StarSet>
         std::ostream& os, const StellarCartography::StarSet& sl);
 };
 
+template<>
+struct print_log_value<std::list<StellarCartography::StarSet>>
+{
+    void operator()(
+        std::ostream& os, const std::list<StellarCartography::StarSet>& sl);
+};
+
 }
 }
 

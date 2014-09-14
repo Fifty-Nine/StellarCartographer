@@ -48,3 +48,15 @@ print_log_value<StarSet>::operator()(
     os << ")";
 }
 
+void 
+print_log_value<std::list<StellarCartography::StarSet>>::operator()(
+        std::ostream& os, const std::list<StellarCartography::StarSet>& sl)
+{
+    os << "StarSetList(";
+    for (auto ss : sl)
+    {
+        print_log_value<StarSet>()(os, ss);
+        os << ",";
+    }
+    os << ")";
+}
