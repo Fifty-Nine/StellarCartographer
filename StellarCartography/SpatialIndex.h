@@ -25,9 +25,17 @@ public:
     size_t size() const;
 
     Star nearestNeighbor(const std::string& name, double threshold) const;
+    Star nearestNeighbor(const Star& star, double threshold) const;
+
     std::list<Star> neighbors(const std::string& name, double threshold) const;
+    std::list<Star> neighbors(const Star& star, double threshold) const;
+
     std::list<Star> path(const std::string& name, double threshold) const;
+    std::list<Star> path(const Star& star, double threshold) const;
+
     std::set<Star> reachable(const std::string& name, double threshold) const;
+    std::set<Star> reachable(const Star& star, double threshold) const;
+
     std::list<std::set<Star>> connectedComponents(double threshold) const;
 };
 
