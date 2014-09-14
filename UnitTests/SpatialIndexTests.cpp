@@ -52,7 +52,7 @@ SC_TEST_CASE(SpatialIndexTests, TestNearestNeighbor)
     BOOST_CHECK_EQUAL(
         proximaCentauri(), g.nearestNeighbor(sol().getName(), 5.0));
     BOOST_CHECK_EQUAL(
-        betaCanisMajoris(), g.nearestNeighbor(alphaCentauri().getName(), 6.0)
+        betaCanisMajoris(), g.nearestNeighbor(alphaCentauri().getName(), 7.0)
     );
     BOOST_CHECK_EQUAL(
         Star(), g.nearestNeighbor(sirius(), 1.0)

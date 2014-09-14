@@ -1,5 +1,7 @@
 #include "StellarCartography/SpatialIndex.h"
 
+#include <sstream>
+
 using namespace StellarCartography;
 
 SpatialIndex::SpatialIndex()
@@ -11,7 +13,9 @@ Star SpatialIndex::getStar(const std::string& name) const
     auto it = names.find(name);
     if (it == names.end())
     {
-        throw std::invalid_argument(name);
+        std::ostringstream os; 
+        os << "Unknown star: " << name;
+        throw std::invalid_argument(os.str());
     }
 
     return it->second;
@@ -33,7 +37,7 @@ NeighborMap SpatialIndex::getNeighborMap(double t, double tolerance) const
     {
         result.add(kv.second);
     }
-    maps.emplace(t, std::move(result));
+    maps.emplace(t, result);
     return result;
 }
 
@@ -49,7 +53,7 @@ void SpatialIndex::insert(const Star& s)
 Star
 SpatialIndex::nearestNeighbor(const Star& star, double threshold) const
 {
-    return { }; 
+    return getNeighborMap(threshold, 10.0).nearestNeighbor(star, threshold);
 }
 
 Star 

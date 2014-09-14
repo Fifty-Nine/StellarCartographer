@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 
 using namespace StellarCartography;
 
@@ -84,7 +85,9 @@ NeighborMap::DistanceMap NeighborMap::get(const Star& star) const
     auto it = nodes_.find(star);
     if (it == nodes_.end())
     {
-        throw std::invalid_argument("star");
+        std::ostringstream os;
+        os << "Unknown star: " << star.getName();
+        throw std::invalid_argument(os.str());
     }
 
     return it->second;
