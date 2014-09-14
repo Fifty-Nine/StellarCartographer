@@ -22,7 +22,6 @@ public:
     NeighborMap(double threshold);
 
     void add(const Star& s);
-    void remove(const Star& s);
     StarSet neighbors(const Star& name, double threshold) const;
     Star nearestNeighbor(const Star& name, double threshold) const;
 };

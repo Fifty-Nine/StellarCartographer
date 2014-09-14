@@ -11,10 +11,6 @@ void NeighborMap::add(const Star& s)
 {
 }
 
-void NeighborMap::remove(const Star& s)
-{
-}
-
 StarSet
 NeighborMap::neighbors(const Star& star, double threshold) const
 {
