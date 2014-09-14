@@ -32,43 +32,43 @@ SpatialIndex::nearestNeighbor(const std::string& name, double threshold) const
     return Star();
 }
 
-std::list<Star> 
+StarSet 
 SpatialIndex::neighbors(const Star& star, double threshold) const
 {
     return neighbors(star.getName(), threshold);
 }
 
-std::list<Star> 
+StarSet 
 SpatialIndex::neighbors(const std::string& name, double threshold) const
 {
     return { };
 }
 
-std::list<Star> 
+StarList 
 SpatialIndex::path(const Star& star, double threshold) const
 {
     return path(star.getName(), threshold);
 }
 
-std::list<Star> 
+StarList 
 SpatialIndex::path(const std::string& name, double threshold) const
 {
     return { };
 }
 
-std::set<Star> 
+StarSet 
 SpatialIndex::reachable(const Star& star, double threshold) const
 {
     return reachable(star.getName(), threshold);
 }
 
-std::set<Star> 
+StarSet 
 SpatialIndex::reachable(const std::string& name, double threshold) const
 {
     return { };
 }
 
-std::list<std::set<Star>> 
+std::list<StarSet> 
 SpatialIndex::connectedComponents(double threshold) const
 {
     return { };

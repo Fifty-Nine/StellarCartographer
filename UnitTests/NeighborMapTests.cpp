@@ -7,7 +7,7 @@ using namespace StellarCartography;
 
 SC_TEST_SUITE(NeighborMapTests)
 
-bool contains(const std::string& name, const std::list<Star>& l)
+bool contains(const std::string& name, const StarSet& l)
 {
     return std::find_if(
         l.begin(), l.end(),
@@ -38,7 +38,7 @@ SC_TEST_CASE(NeighborMapTests, TestBasic)
     BOOST_CHECK_THROW(nm.neighbors("A", 11.0), std::out_of_range);
 
     neighbors = nm.neighbors("A", 1.0);
-    BOOST_CHECK_EQUAL(std::list<Star>(), neighbors);
+    BOOST_CHECK_EQUAL(StarSet(), neighbors);
 
     neighbors = nm.neighbors("E", 3.0);
     BOOST_CHECK_EQUAL(2, neighbors.size());

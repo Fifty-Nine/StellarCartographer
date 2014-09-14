@@ -1,6 +1,8 @@
 #ifndef SC_STAR_H
 #define SC_STAR_H
 
+#include <list>
+#include <set>
 #include <string>
 
 #include "StellarCartography/Coordinate.h"
@@ -29,6 +31,9 @@ public:
             coords_ == s.coords_;
     }
 };
+
+typedef std::list<Star> StarList;
+typedef std::set<Star> StarSet;
 
 }
 

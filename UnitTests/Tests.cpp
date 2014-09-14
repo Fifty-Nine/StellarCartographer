@@ -20,11 +20,26 @@ print_log_value<Star>::operator()(std::ostream& os, const Star& s)
     os << ")";
 }
 
-void print_log_value<std::list<Star>>::operator()(
+void 
+print_log_value<StarList>::operator()(
     std::ostream& os, 
-    const std::list<StellarCartography::Star>& sl)
+    const StarList& sl)
 {
     os << "StarList(";
+    for (auto s : sl)
+    {
+        print_log_value<Star>()(os, s);
+        os << ",";
+    }
+    os << ")";
+}
+
+void 
+print_log_value<StarSet>::operator()(
+    std::ostream& os, 
+    const StarSet& sl)
+{
+    os << "StarSet(";
     for (auto s : sl)
     {
         print_log_value<Star>()(os, s);

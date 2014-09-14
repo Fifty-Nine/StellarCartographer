@@ -20,7 +20,7 @@ public:
 
     void add(const Star& s);
     void remove(const Star& s);
-    std::list<Star> neighbors(const std::string& name, double threshold) const;
+    StarSet neighbors(const std::string& name, double threshold) const;
     Star nearestNeighbor(const std::string& name, double threshold) const;
 };
 

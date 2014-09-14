@@ -28,10 +28,17 @@ struct print_log_value<StellarCartography::Star>
 };
 
 template<>
-struct print_log_value<std::list<StellarCartography::Star>>
+struct print_log_value<StellarCartography::StarList>
 {
     void operator()(
-        std::ostream& os, const std::list<StellarCartography::Star>& c);
+        std::ostream& os, const StellarCartography::StarList& sl);
+};
+
+template<>
+struct print_log_value<StellarCartography::StarSet>
+{
+    void operator()(
+        std::ostream& os, const StellarCartography::StarSet& sl);
 };
 
 }

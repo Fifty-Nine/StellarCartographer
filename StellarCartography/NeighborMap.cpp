@@ -15,7 +15,7 @@ void NeighborMap::remove(const Star& s)
 {
 }
 
-std::list<Star> 
+StarSet
 NeighborMap::neighbors(const std::string& name, double threshold) const
 {
     return { };
