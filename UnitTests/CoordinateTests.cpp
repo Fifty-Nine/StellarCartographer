@@ -40,4 +40,12 @@ SC_TEST_CASE(CoordinateTests, Sanity)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(CoordinateTests, InitList)
+{
+    Coordinate a(1.0, 2.0, 3.0);
+    Coordinate b { 1.0, 2.0, 3.0 };
+
+    BOOST_CHECK_EQUAL(a, b);
+}
+
 SC_TEST_SUITE_END()
