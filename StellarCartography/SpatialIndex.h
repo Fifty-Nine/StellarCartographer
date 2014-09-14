@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <set>
 
 #include "StellarCartography/NeighborMap.h"
@@ -15,13 +16,14 @@ class Coordinate;
 
 class SpatialIndex
 {
-    typedef std::map<std::string, Star> NameMap;
+    typedef std::unordered_map<std::string, Star> NameMap;
     typedef NameMap::value_type NameEntry;
     typedef std::map<double, NeighborMap> LookupTable;
     typedef LookupTable::value_type LookupEntry;
     NameMap names;
     mutable LookupTable maps;
 
+    Star getStar(const std::string& name) const;
     NeighborMap getNeighborMap(double t, double tolerance = 0.5) const;
 
 public:

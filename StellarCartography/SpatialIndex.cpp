@@ -6,6 +6,17 @@ SpatialIndex::SpatialIndex()
 {
 }
 
+Star SpatialIndex::getStar(const std::string& name) const
+{
+    auto it = names.find(name);
+    if (it == names.end())
+    {
+        throw std::invalid_argument(name);
+    }
+
+    return it->second;
+}
+
 NeighborMap SpatialIndex::getNeighborMap(double t, double tolerance) const
 {
     auto it = maps.upper_bound(t);
@@ -38,31 +49,31 @@ void SpatialIndex::insert(const Star& s)
 Star
 SpatialIndex::nearestNeighbor(const Star& star, double threshold) const
 {
-    return nearestNeighbor(star.getName(), threshold);
+    return { }; 
 }
 
 Star 
 SpatialIndex::nearestNeighbor(const std::string& name, double threshold) const
 {
-    return Star();
+    return nearestNeighbor(getStar(name), threshold);
 }
 
 StarSet 
 SpatialIndex::neighbors(const Star& star, double threshold) const
 {
-    return neighbors(star.getName(), threshold);
+    return { }; 
 }
 
 StarSet 
 SpatialIndex::neighbors(const std::string& name, double threshold) const
 {
-    return { };
+    return neighbors(getStar(name), threshold);
 }
 
 StarList 
 SpatialIndex::path(const Star& from, const Star& to, double threshold) const
 {
-    return path(from.getName(), to.getName(), threshold);
+    return { };
 }
 
 StarList 
@@ -71,19 +82,19 @@ SpatialIndex::path(
     const std::string& to,
     double threshold) const
 {
-    return { };
+    return path(getStar(from), getStar(to), threshold);
 }
 
 StarSet 
 SpatialIndex::reachable(const Star& star, double threshold) const
 {
-    return reachable(star.getName(), threshold);
+    return { };
 }
 
 StarSet 
 SpatialIndex::reachable(const std::string& name, double threshold) const
 {
-    return { };
+    return reachable(getStar(name), threshold);
 }
 
 std::list<StarSet> 
