@@ -89,7 +89,7 @@ SC_TEST_CASE(SpatialIndexTests, TestPath)
     );
 
     BOOST_CHECK_EQUAL(
-        (StarList { sol(), alphaCentauri(), betaCanisMajoris() }),
+        (StarList { sol(), proximaCentauri(), alphaCentauri(), betaCanisMajoris() }),
         (g.path(sol().getName(), betaCanisMajoris().getName(), 10))
     );
 }
@@ -105,7 +105,7 @@ SC_TEST_CASE(SpatialIndexTests, TestRoutingWeight)
     Star b { "B", { 1, 0, 0 } };
     Star c { "C", { 2, 0, 0 } };
     Star d { "D", { 3, 0, 0 } };
-    Star e { "E", { 2, 1, 0 } };
+    Star e { "E", { 1.5, 0.5, 0 } };
     g.insert(a);
     g.insert(b);
     g.insert(c);
@@ -115,7 +115,7 @@ SC_TEST_CASE(SpatialIndexTests, TestRoutingWeight)
     
     BOOST_CHECK_EQUAL(
         (StarList { a, e, d }),
-        (g.path(a, d, 2.5))
+        (g.path(a, d, 1.99))
     );
 
     BOOST_CHECK_EQUAL(

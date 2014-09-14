@@ -1,6 +1,8 @@
 #include "StellarCartography/SpatialIndex.h"
 
 #include <algorithm>
+#include <boost/heap/fibonacci_heap.hpp>
+#include <limits>
 #include <sstream>
 
 using namespace StellarCartography;
@@ -78,7 +80,64 @@ SpatialIndex::neighbors(const std::string& name, double threshold) const
 StarList 
 SpatialIndex::path(const Star& from, const Star& to, double threshold) const
 {
-    return { };
+    typedef std::pair<int, Star> PQEntry;
+    typedef 
+        boost::heap::fibonacci_heap<
+            PQEntry, 
+            boost::heap::compare<std::greater<PQEntry>>
+        > PQ;
+    typedef PQ::handle_type PQHandle;
+        
+    std::unordered_map<Star, int> dist;
+    std::unordered_map<Star, Star> prev;
+    std::unordered_map<Star, PQHandle> handles;
+
+    PQ pq;
+
+    for (auto kv : names)
+    {
+        auto v = kv.second;
+        int d = (v == from) ? 0 : std::numeric_limits<int>::max();
+        dist[v] = d;
+        handles[v] = pq.push( PQEntry { d, v } );
+    }
+
+    while (!pq.empty())
+    {
+        auto u = pq.top().second;
+        pq.pop();
+
+        for (auto v : neighbors(u, threshold))
+        {
+            auto d = dist[u] + 1;
+            if (d < dist[v])
+            {
+                dist[v] = d;
+                prev[v] = u;
+                pq.update(handles[v], PQEntry { d, v });
+            }
+        }
+    }
+
+    StarList result;
+    Star c = to;
+    decltype(prev)::const_iterator it;
+
+    while ((it = prev.find(c)) != prev.end())
+    {
+        result.push_back(c);
+        c = it->second;
+    }
+
+    if (c != from)
+    {
+        return StarList();
+    }
+
+    result.push_back(from);
+    std::reverse(result.begin(), result.end());
+
+    return result;
 }
 
 StarList 

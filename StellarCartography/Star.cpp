@@ -27,3 +27,8 @@ bool Star::operator<(const Star& s) const
 {
     return compare(*this, s) < 0;
 }
+
+std::size_t std::hash<Star>::operator()(const Star& s) const
+{
+    return std::hash<std::string>()(s.getName());  
+}
