@@ -3,6 +3,8 @@
 #include <fstream>
 #include <functional>
 #include <boost/regex.hpp>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #include "StellarCartography/SpatialIndex.h"
 
@@ -58,12 +60,28 @@ void processQuery(const CommandTable& c, const std::string& cmd)
     if (args.size() == 0) return;
 
     auto it = c.find(args[0]);
-    if (it == c.end())
+    if (it != c.end())
+    {
+        it->second(args);
+    }
+    else
     {
         std::cout << "Unknown command: " << args[0] << std::endl;
     }
+}
 
-    it->second(args);
+bool prompt(std::string& s)
+{
+    using namespace std;
+    char *buf = readline("scq $ ");
+
+    if (!buf) return false;
+
+    s = std::string(buf);
+    add_history(buf);
+    free(buf);
+
+    return true;
 }
 
 int main(int argc, char *argv[])
@@ -74,29 +92,91 @@ int main(int argc, char *argv[])
 
     CommandTable cmds 
     {
-        { "nearest", [&g](ArgList args) 
+        { 
+            "nearest", 
+            [&g](ArgList args) 
             {
                 Star from = g.getStar(args[1]);
                 Star to = 
                     g.nearestNeighbor(from, lexical_cast<double>(args[2]));
                 cout << "Neighbor: " << to.getName() 
-                     << "Distance: " 
+                     << " Distance: " 
                      << from.getCoords().distance(to.getCoords()) 
                      << endl;
+            }
+        },
+        { 
+            "neighbors", 
+            [&g](ArgList args)
+            {
+                Star from = g.getStar(args[1]);
+                double t = lexical_cast<double>(args[2]);
+                for (auto n : g.neighbors(from, t))
+                {
+                    cout << "Neighbor: " << n.getName()
+                         << " Distance: " 
+                         << from.getCoords().distance(n.getCoords()) 
+                         << endl;
+                }
+            }
+        },
+        {
+            "path",
+            [&g](ArgList a)
+            {
+                Star from = g.getStar(a[1]);
+                Star to = g.getStar(a[2]);
+                double t = lexical_cast<double>(a[3]);
+
+                for (auto u : g.path(from, to, t))
+                {
+                    cout << u.getName() << " " 
+                         << from.getCoords().distance(u.getCoords())
+                         << endl;
+                    from = u;
+                }
+            }
+        },
+        {
+            "reachable",
+            [&g](ArgList a)
+            {
+                Star from = g.getStar(a[1]);
+                double t = lexical_cast<double>(a[2]);
+
+                for (auto v : g.reachable(from, t))
+                {
+                    cout << v.getName() << std::endl;
+                }
+            }
+        },
+        {
+            "connected",
+            [&g](ArgList a)
+            {
+                double t = lexical_cast<double>(a[1]);
+
+                for (auto cc : g.connectedComponents(t))
+                {
+                    cout << "Component:" << endl;
+                    for (auto v : cc)
+                    {
+                        cout << "\t" << v.getName() << endl;
+                    }
+                }
             }
         }
     };
 
     while (true)
     {
-        std::cout << "scq $ ";
-
         std::string cmd;
-        if (!std::getline(std::cin, cmd).good())
+        if (!prompt(cmd))
         {
             std::cout << std::endl;
             return 0;
         }
+
         try
         {
             processQuery(cmds, cmd);

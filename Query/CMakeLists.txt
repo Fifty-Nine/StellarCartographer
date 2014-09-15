@@ -3,4 +3,4 @@ add_executable(scq
 )
 
 link_directories(${StellarCartographer_BINARY_DIR}/StellarCartography)
-target_link_libraries(scq StellarCartography ${Boost_LIBRARIES})
+target_link_libraries(scq StellarCartography readline ${Boost_LIBRARIES})
