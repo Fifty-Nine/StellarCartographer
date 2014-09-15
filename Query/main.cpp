@@ -10,9 +10,11 @@
 
 using namespace StellarCartography;
 
-SpatialIndex loadIndex()
+std::list<std::string> star_names;
+SpatialIndex g;
+
+void loadIndex()
 {
-    SpatialIndex result;
     std::ifstream is("/home/princet/Coordinates.csv");
 
     std::string line;
@@ -22,7 +24,7 @@ SpatialIndex loadIndex()
         std::vector<std::string> strs;
         boost::split(strs, line, boost::is_any_of(","));
         
-        result.insert(
+        g.insert(
             {
                 strs[0],
                 {
@@ -32,9 +34,8 @@ SpatialIndex loadIndex()
                 }
             }
         );
+        star_names.push_back(strs[0]);
     }
-
-    return result;
 }
 
 typedef std::vector<std::string> ArgList;
@@ -43,17 +44,22 @@ typedef std::unordered_map<std::string, QueryFcn> CommandTable;
 using namespace std; 
 using namespace boost;
 
-SpatialIndex g = loadIndex();
+template<class T = std::string>
+T getArg(ArgList args, size_t idx)
+{
+    if (idx >= args.size()) throw std::out_of_range("Missing argument");
+    return lexical_cast<T>(args[idx]);
+}
 
 CommandTable cmds 
 {
     { 
-        "nearest", 
+        "nearest",
         [](ArgList args) 
         {
-            Star from = g.getStar(args[1]);
+            Star from = g.getStar(getArg(args, 1));
             Star to = 
-                g.nearestNeighbor(from, lexical_cast<double>(args[2]));
+                g.nearestNeighbor(from, getArg<double>(args, 2));
             cout << "Neighbor: " << to.getName() 
                  << " Distance: " 
                  << from.getCoords().distance(to.getCoords()) 
@@ -64,8 +70,8 @@ CommandTable cmds
         "neighbors", 
         [](ArgList args)
         {
-            Star from = g.getStar(args[1]);
-            double t = lexical_cast<double>(args[2]);
+            Star from = g.getStar(getArg(args, 1));
+            double t = getArg<double>(args, 2);
             for (auto n : g.neighbors(from, t))
             {
                 cout << "Neighbor: " << n.getName()
@@ -79,9 +85,9 @@ CommandTable cmds
         "path",
         [](ArgList a)
         {
-            Star from = g.getStar(a[1]);
-            Star to = g.getStar(a[2]);
-            double t = lexical_cast<double>(a[3]);
+            Star from = g.getStar(getArg(a, 1));
+            Star to = g.getStar(getArg(a, 2));
+            double t = getArg<double>(a, 3);
 
             for (auto u : g.path(from, to, t))
             {
@@ -96,8 +102,8 @@ CommandTable cmds
         "reachable",
         [](ArgList a)
         {
-            Star from = g.getStar(a[1]);
-            double t = lexical_cast<double>(a[2]);
+            Star from = g.getStar(getArg(a, 1));
+            double t = getArg<double>(a, 2);
 
             for (auto v : g.reachable(from, t))
             {
@@ -109,7 +115,7 @@ CommandTable cmds
         "connected",
         [](ArgList a)
         {
-            double t = lexical_cast<double>(a[1]);
+            double t = getArg<double>(a, 1);
 
             for (auto cc : g.connectedComponents(t))
             {
@@ -123,13 +129,13 @@ CommandTable cmds
     }
 };
 
-void processQuery(const CommandTable& c, const std::string& cmd)
+std::vector<std::string> split_args(const std::string& s)
 {
     boost::regex split_regex("(^|\\s+)('.*?'|[^\\s]+)");
     std::vector<std::string> args;
 
     std::transform(
-        boost::sregex_iterator(cmd.begin(), cmd.end(), split_regex),
+        boost::sregex_iterator(s.begin(), s.end(), split_regex),
         boost::sregex_iterator(),
         std::back_inserter(args),
         [](boost::smatch m) 
@@ -137,7 +143,12 @@ void processQuery(const CommandTable& c, const std::string& cmd)
             return boost::trim_copy_if(m.str(), boost::is_any_of(" \t'")); 
         }
     );
-   
+    return args;
+}
+
+void processQuery(const CommandTable& c, const std::string& cmd)
+{
+    std::vector<std::string> args = split_args(cmd);
     if (args.size() == 0) return;
 
     auto it = c.find(args[0]);
@@ -151,38 +162,54 @@ void processQuery(const CommandTable& c, const std::string& cmd)
     }
 }
 
-std::vector<std::string> cmd_completions(const std::string& text)
+char *cmd_generator(const char *text, int state)
 {
-    std::vector<std::string> candidates;
-    for (auto c : cmds)
+    static CommandTable::const_iterator it;
+
+    if (state == 0)
     {
-        if (boost::starts_with(c.first, text))
+        it = cmds.begin();
+    }
+
+    while (it != cmds.end())
+    {
+        auto s = it->first;
+        ++it;
+        if (boost::starts_with(s, text))
         {
-            candidates.push_back(c.first);
+            return strdup(s.c_str());
         }
     }
-    return candidates;
+
+    return NULL;
+}
+
+char *star_generator(const char *text, int state)
+{
+    static std::list<std::string>::const_iterator it;
+
+    if (state == 0)
+    {
+        it = star_names.begin();
+    }
+
+    while (it != star_names.end())
+    {
+        auto s = *it;
+        ++it;
+        if (boost::starts_with(s, text))
+        {
+            if (s.find(' ') != string::npos) s = "'" + s + "'";
+            return strdup(s.c_str());
+        }
+    }
+    return NULL;
 }
 
 char **completer(const char *text, int start, int end)
 {
-    if (start != 0)
-    {
-        rl_bind_key('\t', rl_abort);
-        return NULL;   
-    }
-
-    auto candidates = cmd_completions(text);
-    if (candidates.empty()) { return NULL; }
-
-    char **result = (char**)malloc(sizeof(char*) * (candidates.size() + 1));
-
-    for (size_t i = 0; i < candidates.size(); ++i)
-    {
-        result[i] = strdup(candidates[i].c_str());
-    }
-    result[candidates.size()] = 0;
-    return result;
+    auto generator = (start == 0) ? cmd_generator : star_generator;
+    return rl_completion_matches(text, generator);
 }
 
 bool prompt(std::string& s)
@@ -207,6 +234,8 @@ int main(int argc, char *argv[])
 {
     using namespace std;
     using namespace boost;
+
+    loadIndex();
 
     while (true)
     {
