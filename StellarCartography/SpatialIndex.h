@@ -23,7 +23,6 @@ class SpatialIndex
     NameMap names;
     mutable LookupTable maps;
 
-    Star getStar(const std::string& name) const;
     NeighborMap getNeighborMap(double t, double tolerance = 0.5) const;
 
 public:
@@ -31,6 +30,7 @@ public:
 
     void insert(const Star& s);
 
+    Star getStar(const std::string& name) const;
     Star nearestNeighbor(const std::string& name, double threshold) const;
     Star nearestNeighbor(const Star& star, double threshold) const;
 

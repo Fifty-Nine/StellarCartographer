@@ -8,7 +8,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost
     1.49.0
-    COMPONENTS unit_test_framework
+    COMPONENTS unit_test_framework regex
     REQUIRED
 )
 
@@ -21,3 +21,4 @@ add_compile_options("-std=c++11")
 
 add_subdirectory(StellarCartography)
 add_subdirectory(UnitTests)
+add_subdirectory(Query)
