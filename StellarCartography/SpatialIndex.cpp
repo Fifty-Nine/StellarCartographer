@@ -106,9 +106,12 @@ SpatialIndex::path(const Star& from, const Star& to, double threshold) const
     {
         auto u = pq.top().second;
         pq.pop();
+        handles.erase(u);
 
         for (auto v : neighbors(u, threshold))
         {
+            if (handles.find(v) == handles.end()) continue;
+
             auto d = dist[u] + 1;
             if (d < dist[v])
             {
