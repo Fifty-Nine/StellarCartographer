@@ -1,16 +1,31 @@
 #include "StellarCartography/NeighborMap.h"
 
 #include <algorithm>
+#include <boost/graph/graph_concepts.hpp>
+#include <boost/concept_check.hpp>
 #include <cmath>
 #include <sstream>
+
+#include "StellarCartography/NeighborMapGraphTraits.h"
 
 using namespace StellarCartography;
 
 #define sq(x) ((x)*(x))
 
+namespace StellarCartography
+{
+
+typedef boost::graph_traits<NeighborMap> traits;
+
+
+} /* namespace StellarCartography */
+
 NeighborMap::NeighborMap(double threshold) : 
     t2_(sq(threshold))
 {
+    BOOST_CONCEPT_ASSERT((boost::GraphConcept<NeighborMap>));
+    BOOST_CONCEPT_ASSERT((boost::VertexListGraphConcept<NeighborMap>));
+    BOOST_CONCEPT_ASSERT((boost::IncidenceGraphConcept<NeighborMap>));
 }
 
 void NeighborMap::add(const Star& s)
@@ -32,9 +47,8 @@ void NeighborMap::add(const Star& s)
 }
 
 StarSet
-NeighborMap::neighbors(const Star& star, double threshold) const
+NeighborMap::neighborsImpl(const Star& star, double t2) const
 {
-    double t2 = checkThreshold(threshold);
     auto nearby = get(star);
 
     StarSet result;
@@ -48,9 +62,8 @@ NeighborMap::neighbors(const Star& star, double threshold) const
 }
 
 Star 
-NeighborMap::nearestNeighbor(const Star& star, double threshold) const
+NeighborMap::nearestNeighborImpl(const Star& star, double t2) const
 {
-    double t2 = checkThreshold(threshold);
     auto nearby = get(star);
 
     if (nearby.size() == 0) { return Star(); }
@@ -58,6 +71,26 @@ NeighborMap::nearestNeighbor(const Star& star, double threshold) const
     auto nearest = nearby.begin();
 
     return (nearest->first < t2) ? nearest->second : Star();
+}
+
+StarSet NeighborMap::neighbors(const Star& name) const 
+{
+    return neighborsImpl(name, t2_);
+}
+
+StarSet NeighborMap::neighbors(const Star& name, double t) const
+{
+    return neighborsImpl(name, checkThreshold(t));
+}
+
+Star NeighborMap::nearestNeighbor(const Star& name) const
+{
+    return nearestNeighborImpl(name, t2_);
+}
+
+Star NeighborMap::nearestNeighbor(const Star& name, double t) const
+{
+    return nearestNeighborImpl(name, checkThreshold(t));
 }
 
 double NeighborMap::checkThreshold(double threshold) const
