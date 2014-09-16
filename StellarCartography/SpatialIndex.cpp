@@ -2,10 +2,38 @@
 
 #include <algorithm>
 #include <boost/heap/fibonacci_heap.hpp>
+#include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/visitors.hpp>
 #include <limits>
 #include <sstream>
 
+#include "StellarCartography/NeighborMapGraphTraits.h"
+
 using namespace StellarCartography;
+
+namespace
+{
+
+template<class EventFilter>
+class lambda_visitor
+{
+    typedef Star T;
+    typedef NeighborMap G;
+    typedef std::function<void(const T&, const G&)> fcn_type;
+    fcn_type f_;
+public:
+    typedef EventFilter event_filter;
+    lambda_visitor(const fcn_type& f = fcn_type()) : f_(f) { }
+
+    void operator()(const T& t, const G& g) { f_(t, g); }
+};
+
+template<class T>
+using StarMap = std::unordered_map<Star, T>;
+template<class T>
+using PMap = boost::associative_property_map<StarMap<T>>;
+
+}
 
 SpatialIndex::SpatialIndex()
 {
@@ -26,10 +54,8 @@ Star SpatialIndex::getStar(const std::string& name) const
 
 NeighborMap SpatialIndex::getNeighborMap(double t, double tolerance) const
 {
-    auto it = maps.upper_bound(t);
-
-    if (it != maps.end() &&
-        (it->first - t) >= 0.0 && (it->first - t) < tolerance)
+    auto it = maps.find(t);
+    if (it != maps.end())
     {
         return it->second;
     }
@@ -80,56 +106,27 @@ SpatialIndex::neighbors(const std::string& name, double threshold) const
 StarList 
 SpatialIndex::path(const Star& from, const Star& to, double threshold) const
 {
-    typedef std::pair<int, Star> PQEntry;
-    typedef 
-        boost::heap::fibonacci_heap<
-            PQEntry, 
-            boost::heap::compare<std::greater<PQEntry>>
-        > PQ;
-    typedef PQ::handle_type PQHandle;
-        
-    std::unordered_map<Star, int> dist;
-    std::unordered_map<Star, Star> prev;
-    std::unordered_map<Star, PQHandle> handles;
+    NeighborMap m = getNeighborMap(threshold);
+    
+    StarMap<Star> prev;
+    PMap<Star> prev_prop(prev);
+    StarMap<boost::default_color_type> colors;
+    PMap<boost::default_color_type> color_prop(colors);
 
-    PQ pq;
-
-    for (auto kv : names)
-    {
-        auto v = kv.second;
-        int d = (v == from) ? 0 : std::numeric_limits<int>::max();
-        dist[v] = d;
-        handles[v] = pq.push( PQEntry { d, v } );
-    }
-
-    while (!pq.empty())
-    {
-        auto u = pq.top().second;
-        pq.pop();
-        handles.erase(u);
-
-        for (auto v : neighbors(u, threshold))
-        {
-            if (handles.find(v) == handles.end()) continue;
-
-            auto d = dist[u] + 1;
-            if (d < dist[v])
-            {
-                dist[v] = d;
-                prev[v] = u;
-                pq.update(handles[v], PQEntry { d, v });
-            }
-        }
-    }
+    auto p = boost::make_bfs_visitor(
+        boost::record_predecessors(prev_prop, boost::on_tree_edge())
+    );
+    boost::breadth_first_search(m, from, boost::visitor(p).color_map(color_prop));
 
     StarList result;
     Star c = to;
-    decltype(prev)::const_iterator it;
 
-    while ((it = prev.find(c)) != prev.end())
+    while (c != from)
     {
         result.push_back(c);
-        c = it->second;
+        auto n = get(prev_prop, c);
+        if (n == Star()) break;
+        c = n;
     }
 
     if (c != from)
@@ -155,25 +152,23 @@ SpatialIndex::path(
 StarSet 
 SpatialIndex::reachable(const Star& star, double threshold) const
 {
-    std::vector<Star> s;
     StarSet r;
-    s.push_back(star);
-
-    while (!s.empty())
-    {
-        auto v = s.back();
-        s.pop_back();
-
-        r.insert(v);
-
-        for (auto u : neighbors(v, threshold))
-        {
-            if (r.find(u) == r.end())
+    StarMap<boost::default_color_type> color_map;
+    PMap<boost::default_color_type> colors(color_map);
+    auto v = boost::make_bfs_visitor(
+        lambda_visitor<boost::on_discover_vertex>(
+            [&r](const Star& s, const NeighborMap& g)
             {
-                s.push_back(u);
+                r.insert(s);
             }
-        }
-    }
+        )
+    );
+
+    boost::breadth_first_search(getNeighborMap(threshold),
+        star,
+        boost::visitor(v).
+        color_map(colors)
+    );
 
     return r;
 }
