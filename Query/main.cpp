@@ -216,10 +216,12 @@ bool prompt(std::string& s)
 {
     using namespace std;
 
+    rl_completer_quote_characters = "'";
+    rl_filename_quote_characters = " ";
+    rl_filename_quoting_desired = 1;
     rl_attempted_completion_function = &completer;
-    rl_bind_key('\t', rl_complete);
 
-    char *buf = readline("scq $ ");
+    char *buf = readline("scq$ ");
 
     if (!buf) return false;
 
