@@ -1,7 +1,8 @@
 add_executable(tests
     CoordinateTests.cpp
-    SpatialIndexTests.cpp
     NeighborMapTests.cpp
+    SpatialIndexTests.cpp
+    StarMapTests.cpp
     TestMain.cpp
     Tests.cpp
     Tests.h

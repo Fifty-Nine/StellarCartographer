@@ -4,6 +4,7 @@ SET(SOURCES
     NeighborMapGraphTraits.cpp
     SpatialIndex.cpp
     Star.cpp
+    StarMap.cpp
 )
 
 SET(HEADERS
@@ -11,8 +12,9 @@ SET(HEADERS
     Coordinate.h
     NeighborMap.h
     NeighborMapGraphTraits.h
-    Star.h
     SpatialIndex.h
+    Star.h
+    StarMap.h
 )
 
 add_library(StellarCartography
