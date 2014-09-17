@@ -1,9 +1,26 @@
 #include "StellarCartography/Coordinate.h"
 
+#include <boost/concept_check.hpp>
 #include <cmath>
 
-namespace StellarCartography
+using namespace StellarCartography;
+using namespace boost;
+
+namespace 
 {
+
+void concept_check()
+{
+    BOOST_CONCEPT_ASSERT((Assignable<Coordinate>));
+    BOOST_CONCEPT_ASSERT((DefaultConstructible<Coordinate>));
+    BOOST_CONCEPT_ASSERT((CopyConstructible<Coordinate>));
+    BOOST_CONCEPT_ASSERT((EqualityComparable<Coordinate>));
+    BOOST_CONCEPT_ASSERT((LessThanComparable<Coordinate>));
+
+    Coordinate { 0, 0, 0 };
+}
+
+} /* namespace */
 
 Coordinate::Coordinate() :
     v { 0, 0, 0 }
@@ -49,6 +66,4 @@ int Coordinate::compare(const Coordinate& o) const
         if (v[i] > o.v[i]) return 1;
     }
     return 0;
-}
-
 }
