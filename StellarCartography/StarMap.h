@@ -10,6 +10,8 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/random_access_index.hpp>
+#include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 namespace StellarCartography
 {
@@ -94,7 +96,8 @@ public:
     typedef boost::undirected_tag directed_category;
     typedef boost::disallow_parallel_edge_tag edge_parallel_category;
     struct traversal_category : 
-        public virtual boost::vertex_list_graph_tag
+        public virtual boost::vertex_list_graph_tag,
+        public virtual boost::incidence_graph_tag
     { };
 
     /**************************************************************************/
@@ -102,6 +105,27 @@ public:
     /**************************************************************************/
     typedef size_type vertices_size_type;
     typedef const_iterator vertex_iterator;
+    
+    /**************************************************************************/
+    /* IncidenceGraph concept requirements.                                   */
+    /**************************************************************************/
+    typedef std::function<Jump(const Star&)> out_edge_iterator_fcn;
+    typedef std::function<bool(const Star&)> out_edge_filter_fcn;
+    typedef filter_iterator<out_edge_filter_fcn, vertex_iterator> 
+        out_edge_iterator_base;
+    typedef transform_iterator<out_edge_iterator_fcn, out_edge_iterator_base> 
+        out_edge_iterator; 
+    typedef size_type degree_size_type;
+
+    /**************************************************************************/
+    /* Adaptor for IncidenceGraph concept requirements with edges filtered by */
+    /* distance.                                                              */
+    /**************************************************************************/
+    struct ByDistance 
+    {
+        /* todo */
+    };
+
 
     /**************************************************************************/
     /* Container views.                                                       */
@@ -120,6 +144,9 @@ public:
 
     ByName& byName() { return stars_.get<NameMapIndex>(); }
     const ByName& byName() const { return stars_.get<NameMapIndex>(); }
+
+    ByDistance byDistance(double threshold) { return { }; }
+    ByDistance byDistance(double threshold) const { return { }; }
 
     /**************************************************************************/
     /* Algorithms                                                             */
@@ -154,6 +181,15 @@ vertices(const StarMap& g);
 
 StarMap::vertices_size_type
 num_vertices(const StarMap& g);
+
+Star source(const Jump& j, const StarMap& g);
+Star target(const Jump& j, const StarMap& g);
+
+std::pair<StarMap::out_edge_iterator,StarMap::out_edge_iterator>
+out_edges(const Star& u, const StarMap& g);
+
+StarMap::degree_size_type
+out_degree(const Star& u, const StarMap& g);
 
 template<class It>
 StarMap::StarMap(It begin, It end) : 

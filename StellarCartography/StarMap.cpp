@@ -18,6 +18,7 @@ void concept_check()
     BOOST_CONCEPT_ASSERT((RandomAccessContainer<StarMap>));
     BOOST_CONCEPT_ASSERT((GraphConcept<StarMap>));
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap>));
+    BOOST_CONCEPT_ASSERT((IncidenceGraphConcept<StarMap>));
 }
 
 }
@@ -102,3 +103,42 @@ StellarCartography::num_vertices(const StarMap& g)
     return g.size();
 }
 
+Star StellarCartography::source(const Jump& j, const StarMap&)
+{
+    return j.source();
+}
+
+Star StellarCartography::target(const Jump& j, const StarMap&)
+{
+    return j.target();
+}
+
+std::pair<StarMap::out_edge_iterator, StarMap::out_edge_iterator>
+out_edges(const Star& u, const StarMap& g)
+{
+    StarMap::out_edge_filter_fcn p = 
+    [u](const Star& v)
+    {
+        return u != v;
+    };
+
+    StarMap::out_edge_iterator_fcn t = 
+    [u](const Star& v)
+    {
+        return Jump(u, v);
+    };
+
+    auto begin_filt = StarMap::out_edge_iterator_base(p, g.begin());
+    auto end_filt = StarMap::out_edge_iterator_base(p, g.end());
+
+    auto begin = StarMap::out_edge_iterator(begin_filt, t);
+    auto end = StarMap::out_edge_iterator(end_filt, t);
+
+    return std::make_pair(begin, end);
+}
+
+StarMap::degree_size_type
+out_degree(const Star& u, const StarMap& g)
+{
+    return g.size() - 1; 
+}
