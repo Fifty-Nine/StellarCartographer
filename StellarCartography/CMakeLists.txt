@@ -1,5 +1,6 @@
 SET(SOURCES
     Coordinate.cpp
+    Jump.cpp
     NeighborMap.cpp
     NeighborMapGraphTraits.cpp
     SpatialIndex.cpp
@@ -10,6 +11,7 @@ SET(SOURCES
 SET(HEADERS
     All.h
     Coordinate.h
+    Jump.h
     NeighborMap.h
     NeighborMapGraphTraits.h
     SpatialIndex.h

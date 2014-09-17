@@ -8,17 +8,6 @@ using namespace boost;
 namespace
 {
 
-int compare(const Star& l, const Star& r)
-{
-    if (auto c = l.getName().compare(r.getName()))
-    {
-        return c;
-    }
-
-    return l.getCoords().compare(r.getCoords());
-                                          
-}
-
 void concept_check()
 {
     BOOST_CONCEPT_ASSERT((Assignable<Star>));
@@ -34,12 +23,22 @@ void concept_check()
 
 bool Star::operator==(const Star& s) const
 { 
-    return compare(*this, s) == 0;
+    return compare(s) == 0;
 }
 
 bool Star::operator<(const Star& s) const
 {
-    return compare(*this, s) < 0;
+    return compare(s) < 0;
+}
+
+int Star::compare(const Star& o) const
+{
+    if (auto c = getName().compare(o.getName()))
+    {
+        return c;
+    }
+
+    return getCoords().compare(o.getCoords());
 }
 
 std::size_t std::hash<Star>::operator()(const Star& s) const

@@ -29,6 +29,8 @@ public:
 
     bool operator==(const Star& s) const;
     bool operator<(const Star& s) const;
+
+    int compare(const Star& o) const;
 };
 
 typedef std::list<Star> StarList;
