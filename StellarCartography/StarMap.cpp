@@ -1,4 +1,4 @@
-#include <StellarCartography/StarMap.h>
+#include "StellarCartography/StarMap.h"
 
 #include <boost/concept_check.hpp>
 
