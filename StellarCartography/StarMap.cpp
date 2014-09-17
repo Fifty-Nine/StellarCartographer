@@ -1,9 +1,10 @@
 #include "StellarCartography/StarMap.h"
 
 #include <boost/concept_check.hpp>
+#include <boost/graph/graph_concepts.hpp>
 
-namespace StellarCartography
-{
+using namespace StellarCartography;
+using namespace boost;
 
 namespace
 {
@@ -15,6 +16,8 @@ void concept_check()
     StarMap { };
     StarMap { Star(), Star() };
     BOOST_CONCEPT_ASSERT((RandomAccessContainer<StarMap>));
+    BOOST_CONCEPT_ASSERT((GraphConcept<StarMap>));
+    BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap>));
 }
 
 }
@@ -87,4 +90,15 @@ std::list<StarSet> StarMap::connectedComponents(double threshold) const
     return std::list<StarSet>();
 }
 
-} /* namespace StellarCartography */
+std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
+StellarCartography::vertices(const StarMap& g)
+{
+    return std::make_pair(g.begin(), g.end());
+}
+
+StarMap::vertices_size_type
+StellarCartography::num_vertices(const StarMap& g)
+{
+    return g.size();
+}
+

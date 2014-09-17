@@ -1,8 +1,10 @@
 #ifndef SC_STAR_MAP_H
 #define SC_STAR_MAP_H
 
+#include "StellarCartography/Jump.h"
 #include "StellarCartography/Star.h"
 
+#include <boost/graph/graph_traits.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -52,7 +54,7 @@ public:
     StarMap& operator=(StarMap&&) = default;
 
     /**************************************************************************/
-    /* RandomAccessContainer requirements                                     */
+    /* RandomAccessContainer concept requirements                             */
     /**************************************************************************/
     typedef typename seq_index::value_type value_type;
     typedef typename seq_index::reference reference;
@@ -83,6 +85,23 @@ public:
 
     reverse_iterator rend() { return byIndex().rend(); }
     const_reverse_iterator rend() const { return byIndex().rend(); }
+
+    /**************************************************************************/
+    /* Graph concept requirements.                                            */
+    /**************************************************************************/
+    typedef Star vertex_descriptor;
+    typedef Jump edge_descriptor;
+    typedef boost::undirected_tag directed_category;
+    typedef boost::disallow_parallel_edge_tag edge_parallel_category;
+    struct traversal_category : 
+        public virtual boost::vertex_list_graph_tag
+    { };
+
+    /**************************************************************************/
+    /* VertexListGraph concept requirements.                                  */
+    /**************************************************************************/
+    typedef size_type vertices_size_type;
+    typedef const_iterator vertex_iterator;
 
     /**************************************************************************/
     /* Container views.                                                       */
@@ -129,6 +148,12 @@ public:
 private:
     container_type stars_;
 };
+
+std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
+vertices(const StarMap& g);
+
+StarMap::vertices_size_type
+num_vertices(const StarMap& g);
 
 template<class It>
 StarMap::StarMap(It begin, It end) : 
