@@ -26,7 +26,14 @@ StarMap::StarMap(const std::initializer_list<Star>& l) :
 
 Star StarMap::StarMap::getStar(const std::string& name) const
 {
-    return Star();
+    auto it = byName().find(name);
+    if (it == byName().end())
+    {
+        std::ostringstream os;
+        os << "Unknown star: " << name;
+        throw std::invalid_argument(os.str());
+    }
+    return *it;
 }
 
 Star StarMap::nearestNeighbor(const std::string& name, double threshold) const

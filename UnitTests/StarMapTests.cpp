@@ -44,6 +44,17 @@ StarMap basicGalaxy()
     };
 }
 
+SC_TEST_CASE(StarMapTests, TestGetStar)
+{
+    auto g = basicGalaxy();
+
+    BOOST_CHECK_EQUAL(sol(), g.getStar(sol().getName()));
+    BOOST_CHECK_EQUAL(sirius(), g.getStar(sirius().getName()));
+
+    BOOST_CHECK_THROW(g.getStar(Star().getName()), std::invalid_argument);
+    BOOST_CHECK_THROW(g.getStar("Foo"), std::invalid_argument);
+}
+
 SC_TEST_CASE(StarMapTests, TestNearestNeighbor)
 {
     StarMap g = basicGalaxy();
