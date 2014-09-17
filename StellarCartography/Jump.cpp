@@ -68,3 +68,8 @@ int Jump::compare(const Jump& o) const
     return target().compare(o.target());
 }
 
+std::size_t std::hash<Jump>::operator()(const Jump& s) const
+{
+    return std::hash<Star>()(s.source()) | 
+        (std::hash<Star>()(s.target()) < 1);
+}

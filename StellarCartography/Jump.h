@@ -33,4 +33,17 @@ typedef std::list<Jump> JumpList;
 
 } /* namespace StellarCartopgraphy */
 
+namespace std
+{
+
+template<>
+struct hash<StellarCartography::Jump>
+{
+    typedef StellarCartography::Jump argument_type;
+    typedef std::size_t result_type;
+    result_type operator()(const argument_type& s) const;
+};
+
+}
+
 #endif /* SC_JUMP_H */
