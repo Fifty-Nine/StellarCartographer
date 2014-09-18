@@ -44,6 +44,18 @@ StarMap basicGalaxy()
     };
 }
 
+SC_TEST_CASE(StarMapTests, TestCopyCtor)
+{
+    auto h = StarMap();
+    {
+        auto g = basicGalaxy();
+        h = StarMap(g); 
+    }
+
+    BOOST_REQUIRE_EQUAL(basicGalaxy().size(), h.size());
+    h.nearestNeighbor(sol(), 10.0);
+}
+
 SC_TEST_CASE(StarMapTests, TestGetStar)
 {
     auto g = basicGalaxy();

@@ -43,10 +43,39 @@ StarMap::StarMap() :
 {
 }
 
+StarMap::StarMap(const StarMap& m) : 
+    stars_(m.stars_),
+    spatial_storage_(m.spatial_storage_),
+    spatial_index_(initIndex())
+{
+}
+
+StarMap::StarMap(StarMap&& m) : 
+    stars_(std::move(m.stars_)),
+    spatial_storage_(std::move(m.spatial_storage_)),
+    spatial_index_(initIndex())
+{
+}
+
 StarMap::StarMap(const std::initializer_list<Star>& l) :
     StarMap(l.begin(), l.end())
 {
 
+}
+
+StarMap& StarMap::operator=(const StarMap& m) 
+{
+    if (&m == this) return *this;
+    return *this = std::move(StarMap(m));
+}
+
+StarMap& StarMap::operator=(StarMap&& m)
+{
+    stars_ = std::move(m.stars_);
+    spatial_storage_ = std::move(m.spatial_storage_);
+    spatial_index_ = initIndex();
+
+    return *this;
 }
 
 Star StarMap::StarMap::getStar(const std::string& name) const
@@ -74,7 +103,7 @@ Star StarMap::nearestNeighbor(const Star& star, double threshold) const
     flann::Matrix<int> i = toMatrix(index);
     flann::Matrix<double> d = toMatrix(dist);
 
-    spatial_index_.knnSearch(toMatrix(&c), i, d, 2, flann::SearchParams());
+    spatial_index_->knnSearch(toMatrix(&c), i, d, 2, flann::SearchParams());
 
     return (dist[1] < threshold*threshold) ? byIndex().at(index[1]) : Star();
 }
@@ -91,7 +120,7 @@ StarSet StarMap::neighbors(const Star& star, double threshold) const
     std::vector<std::vector<double>> dists;
     double t2 = threshold * threshold;
 
-    spatial_index_.radiusSearch(
+    spatial_index_->radiusSearch(
         toMatrix(&c),
         idx,
         dists,
@@ -147,6 +176,20 @@ StarSet StarMap::reachable(const Star& star, double threshold) const
 std::list<StarSet> StarMap::connectedComponents(double threshold) const
 {
     return std::list<StarSet>();
+}
+        
+auto StarMap::initIndex() 
+    -> spatial_ptr_type
+{
+    /* No make_unique in C++11 :( */
+    spatial_ptr_type result(
+        new spatial_type(
+            matrix_type(spatial_storage_.data(), stars_.size(), 3),
+            flann::KDTreeSingleIndexParams(10, true)
+        )
+    );
+    result->buildIndex();
+    return result;
 }
 
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>

@@ -35,6 +35,7 @@ class StarMap
     > container_type;
 
     typedef flann::KDTreeSingleIndex<flann::L2<double>> spatial_type;
+    typedef std::unique_ptr<spatial_type> spatial_ptr_type;
     typedef std::vector<double> spatial_storage_type;
     typedef flann::Matrix<double> matrix_type;
 
@@ -56,14 +57,14 @@ public:
     /**************************************************************************/
     ~StarMap() = default;
     StarMap();
-    StarMap(const StarMap&) = default;
-    StarMap(StarMap&&) = default;
+    StarMap(const StarMap&);
+    StarMap(StarMap&&);
     StarMap(const std::initializer_list<Star>&);
     template<class It>
     explicit StarMap(It begin, It end); 
 
-    StarMap& operator=(const StarMap&) = default;
-    StarMap& operator=(StarMap&&) = default;
+    StarMap& operator=(const StarMap&);
+    StarMap& operator=(StarMap&&);
 
     /**************************************************************************/
     /* RandomAccessContainer concept requirements                             */
@@ -178,11 +179,12 @@ public:
 
 private:
     template<class It>
-    spatial_storage_type initSpatialStorage(It begin, It end);
+    static spatial_storage_type initSpatialStorage(It begin, It end);
+    spatial_ptr_type initIndex();
 
     container_type stars_;
     spatial_storage_type  spatial_storage_;
-    mutable spatial_type spatial_index_;
+    mutable spatial_ptr_type spatial_index_;
 };
 
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
@@ -229,12 +231,8 @@ StarMap::StarMap(It begin, It end) :
     spatial_storage_(
         std::move(initSpatialStorage(begin, end))
     ),
-    spatial_index_(
-        matrix_type(spatial_storage_.data(), stars_.size(), 3),
-        flann::KDTreeSingleIndexParams(10, true)
-    )
+    spatial_index_(std::move(initIndex()))
 {
-    spatial_index_.buildIndex();
 }
 
 } /* namespace StellarCartography */
