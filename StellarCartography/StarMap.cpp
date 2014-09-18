@@ -65,8 +65,8 @@ StarMap::StarMap(const std::initializer_list<Star>& l) :
 
 StarMap& StarMap::operator=(const StarMap& m) 
 {
-    if (&m == this) return *this;
-    return *this = std::move(StarMap(m));
+    *this = std::move(StarMap(m));
+    return *this;
 }
 
 StarMap& StarMap::operator=(StarMap&& m)
@@ -100,8 +100,8 @@ Star StarMap::nearestNeighbor(const Star& star, double threshold) const
     auto c = star.getCoords();
     int index[2] = { 0 };
     double dist[2] = { 0 };
-    flann::Matrix<int> i = toMatrix(index);
-    flann::Matrix<double> d = toMatrix(dist);
+    flann::Matrix<int> i = toMatrix(index, 1, 2);
+    flann::Matrix<double> d = toMatrix(dist, 1, 2);
 
     spatial_index_->knnSearch(toMatrix(&c), i, d, 2, flann::SearchParams());
 
@@ -188,7 +188,9 @@ auto StarMap::initIndex()
             flann::KDTreeSingleIndexParams(10, true)
         )
     );
-    result->buildIndex();
+
+    if (stars_.size() > 0) result->buildIndex();
+
     return result;
 }
 
