@@ -26,6 +26,7 @@ void concept_check [[gnu::unused]]()
 
     BOOST_CONCEPT_ASSERT((GraphConcept<StarMap::dist_index>));
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap::dist_index>));
+    BOOST_CONCEPT_ASSERT((EdgeListGraphConcept<StarMap::dist_index>));
 }
 
 template<class T>
@@ -227,7 +228,17 @@ Star StellarCartography::source(const Jump& j, const StarMap&)
     return j.source();
 }
 
+Star StellarCartography::source(const Jump& j, const StarMap::dist_index&)
+{
+    return j.source();
+}
+
 Star StellarCartography::target(const Jump& j, const StarMap&)
+{
+    return j.target();
+}
+
+Star StellarCartography::target(const Jump& j, const StarMap::dist_index&)
 {
     return j.target();
 }
@@ -276,4 +287,16 @@ StellarCartography::num_edges(const StarMap& g)
 {
     auto n = num_vertices(g); 
     return (n * (n - 1)) / 2;
+}
+
+auto StellarCartography::edges(const StarMap::dist_index& g)
+    -> decltype(edges(g))
+{
+    return { 0, 0 };
+}
+
+auto StellarCartography::num_edges(const StarMap::dist_index& g)
+    -> decltype(num_edges(g))
+{
+    return 0;
 }

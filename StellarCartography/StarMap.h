@@ -124,7 +124,7 @@ public:
     typedef size_type degree_size_type;
 
     /**************************************************************************/
-    /* Adaptor for IncidenceGraph and EdgeListGraph concept requirements with */
+    /* EdgeListGraph concept requirements.                                    */
     /**************************************************************************/
     typedef size_type edges_size_type;
     typedef pairs_iterator<vertex_iterator, Jump> edge_iterator;
@@ -154,6 +154,10 @@ public:
         /* VertexListGraph concept */
         typedef StarMap::vertices_size_type vertices_size_type;
         typedef StarMap::vertex_iterator vertex_iterator;
+
+        /* EdgeListGraph concept */
+        typedef StarMap::size_type edges_size_type;
+        typedef /*todo*/ Jump* edge_iterator;
 
         /* todo */
     };
@@ -225,6 +229,8 @@ num_vertices(const StarMap::dist_index& g);
 
 Star source(const Jump& j, const StarMap& g);
 Star target(const Jump& j, const StarMap& g);
+Star source(const Jump& j, const StarMap::dist_index& g);
+Star target(const Jump& j, const StarMap::dist_index& g);
 
 std::pair<StarMap::out_edge_iterator,StarMap::out_edge_iterator>
 out_edges(const Star& u, const StarMap& g);
@@ -237,6 +243,15 @@ edges(const StarMap& g);
 
 StarMap::edges_size_type
 num_edges(const StarMap& g);
+
+std::pair<
+    StarMap::dist_index::edge_iterator,
+    StarMap::dist_index::edge_iterator
+>
+edges(const StarMap::dist_index& g);
+
+StarMap::dist_index::edges_size_type
+num_edges(const StarMap::dist_index& g);
 
 template<class It>
 auto StarMap::initSpatialStorage(It begin, It end)
