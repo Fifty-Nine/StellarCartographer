@@ -1,7 +1,9 @@
 #ifndef SC_COORDINATE_H
 #define SC_COORDINATE_H
 
+#include <boost/functional/hash/extensions.hpp>
 #include <boost/operators.hpp>
+#include <functional>
 #include <tuple>
 
 namespace StellarCartography
@@ -29,5 +31,35 @@ public:
 };
 
 } /* StellarCartography */
+
+namespace std
+{
+
+template<>
+struct hash<StellarCartography::Coordinate>
+{
+    typedef StellarCartography::Coordinate argument_type;
+    typedef hash<double>::result_type result_type;
+
+    inline result_type 
+    operator()(const argument_type& s) const
+    {
+        hash<double> h;
+        return h(s.x()) ^ (h(s.y()) << 1) ^ (h(s.z()) << 2);
+    }
+};
+
+}
+
+namespace boost
+{
+
+template<>
+struct hash<StellarCartography::Coordinate> : 
+    public std::hash<StellarCartography::Coordinate>
+{
+};
+
+}
 
 #endif /* SC_COORDINATE_H */
