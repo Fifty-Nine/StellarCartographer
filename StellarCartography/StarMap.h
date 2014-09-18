@@ -4,6 +4,7 @@
 #include "StellarCartography/Jump.h"
 #include "StellarCartography/Star.h"
 
+#include <boost/container/flat_map.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/mem_fun.hpp>
@@ -138,8 +139,8 @@ public:
         double t2_;
         const StarMap *m_;
     public:
-        dist_index(double t, const StarMap *m) :
-            t2_(t*t), m_(m)
+        dist_index(double t2, const StarMap *m) :
+            t2_(t2), m_(m)
         { }
 
         const StarMap& parent() const { return *m_; }
@@ -175,8 +176,7 @@ public:
     const coord_index& byCoordinate() const 
     { return stars_.get<CoordinateIndex>(); }
 
-    dist_index byDistance(double threshold) const 
-    { return dist_index(threshold, this); }
+    const dist_index& byDistance(double threshold) const; 
 
     /**************************************************************************/
     /* Algorithms                                                             */
@@ -203,6 +203,8 @@ public:
     std::list<StarSet> connectedComponents(double threshold) const;
 
 private:
+    typedef container::flat_map<double, dist_index> dist_index_cache;
+
     template<class It>
     static spatial_storage_type initSpatialStorage(It begin, It end);
     spatial_ptr_type initIndex();
@@ -210,6 +212,7 @@ private:
     container_type stars_;
     spatial_storage_type  spatial_storage_;
     mutable spatial_ptr_type spatial_index_;
+    mutable dist_index_cache dist_index_cache_;
 };
 
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>

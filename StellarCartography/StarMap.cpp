@@ -50,14 +50,16 @@ StarMap::StarMap() :
 StarMap::StarMap(const StarMap& m) : 
     stars_(m.stars_),
     spatial_storage_(m.spatial_storage_),
-    spatial_index_(initIndex())
+    spatial_index_(initIndex()),
+    dist_index_cache_(m.dist_index_cache_)
 {
 }
 
 StarMap::StarMap(StarMap&& m) : 
     stars_(std::move(m.stars_)),
     spatial_storage_(std::move(m.spatial_storage_)),
-    spatial_index_(initIndex())
+    spatial_index_(initIndex()),
+    dist_index_cache_(std::move(m.dist_index_cache_))
 {
 }
 
@@ -69,7 +71,8 @@ StarMap::StarMap(const std::initializer_list<Star>& l) :
 
 StarMap& StarMap::operator=(const StarMap& m) 
 {
-    *this = std::move(StarMap(m));
+    if (&m != this)
+        *this = std::move(StarMap(m));
     return *this;
 }
 
@@ -78,8 +81,20 @@ StarMap& StarMap::operator=(StarMap&& m)
     stars_ = std::move(m.stars_);
     spatial_storage_ = std::move(m.spatial_storage_);
     spatial_index_ = initIndex();
+    dist_index_cache_ = std::move(m.dist_index_cache_);
 
     return *this;
+}
+
+auto StarMap::byDistance(double d) const
+    -> decltype(byDistance(0.0))
+{
+    auto t2 = d*d;
+    auto it = dist_index_cache_.find(t2);
+
+    return (it != dist_index_cache_.end()) ? 
+        it->second : 
+        dist_index_cache_.emplace_hint(it, t2, dist_index(t2, this))->second;
 }
 
 Star StarMap::StarMap::getStar(const std::string& name) const
