@@ -13,6 +13,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/function_input_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <flann/flann.hpp>
 #include <pairs_iterator.hpp>
 
 namespace StellarCartography
@@ -32,6 +33,10 @@ class StarMap
         >
     > container_type;
 
+    typedef flann::Index<flann::L2<double>> spatial_type;
+    typedef std::vector<double> spatial_storage_type;
+    typedef flann::Matrix<double> matrix_type;
+
     enum { 
         SeqIndex = 0,
         NameSeqIndex = 1,
@@ -47,7 +52,7 @@ public:
     /* Constructors, destructors, assignment operators.                       */
     /**************************************************************************/
     ~StarMap() = default;
-    StarMap() = default;
+    StarMap();
     StarMap(const StarMap&) = default;
     StarMap(StarMap&&) = default;
     StarMap(const std::initializer_list<Star>&);
@@ -170,7 +175,12 @@ public:
     std::list<StarSet> connectedComponents(double threshold) const;
 
 private:
+    template<class It>
+    spatial_storage_type initSpatialStorage(It begin, It end);
+
     container_type stars_;
+    spatial_storage_type  spatial_storage_;
+    spatial_type spatial_index_;
 };
 
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
@@ -195,9 +205,34 @@ StarMap::edges_size_type
 num_edges(const StarMap& g);
 
 template<class It>
-StarMap::StarMap(It begin, It end) : 
-    stars_(begin, end)
+auto StarMap::initSpatialStorage(It begin, It end)
+    -> spatial_storage_type
 {
+    spatial_storage_type result;
+    result.reserve(distance(begin, end) * 3);
+
+    for (auto it = begin; it != end; ++it)
+    {
+        auto c = it->getCoords();
+        result.push_back(c.x());
+        result.push_back(c.y());
+        result.push_back(c.z());
+    }
+    return result;
+}
+
+template<class It>
+StarMap::StarMap(It begin, It end) : 
+    stars_(begin, end), 
+    spatial_storage_(
+        std::move(initSpatialStorage(begin, end))
+    ),
+    spatial_index_(
+        matrix_type(spatial_storage_.data(), stars_.size(), 3),
+        flann::KDTreeIndexParams()
+    )
+{
+    spatial_index_.buildIndex();
 }
 
 } /* namespace StellarCartography */

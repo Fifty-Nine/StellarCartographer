@@ -15,6 +15,9 @@ void concept_check [[gnu::unused]]()
     StarMap(v.begin(), v.end());
     StarMap { };
     StarMap { Star(), Star() };
+    StarMap s1;
+    StarMap s2(s1);
+    StarMap s3(std::move(s2));
     BOOST_CONCEPT_ASSERT((RandomAccessContainer<StarMap>));
     BOOST_CONCEPT_ASSERT((GraphConcept<StarMap>));
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap>));
@@ -24,9 +27,15 @@ void concept_check [[gnu::unused]]()
 
 }
 
-StarMap::StarMap(const std::initializer_list<Star>& l) :
-    stars_(l.begin(), l.end())
+StarMap::StarMap() : 
+    StarMap((Star*)nullptr, (Star*)nullptr)
 {
+}
+
+StarMap::StarMap(const std::initializer_list<Star>& l) :
+    StarMap(l.begin(), l.end())
+{
+
 }
 
 Star StarMap::StarMap::getStar(const std::string& name) const
