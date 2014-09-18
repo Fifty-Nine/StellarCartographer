@@ -9,7 +9,7 @@ using namespace boost;
 namespace
 {
 
-void concept_check()
+void concept_check [[gnu::unused]]() 
 {
     std::vector<Star> v;
     StarMap(v.begin(), v.end());
