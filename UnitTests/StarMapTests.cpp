@@ -55,6 +55,18 @@ SC_TEST_CASE(StarMapTests, TestGetStar)
     BOOST_CHECK_THROW(g.getStar("Foo"), std::invalid_argument);
 }
 
+SC_TEST_CASE(StarMapTests, TestGetEdges)
+{
+    auto g = basicGalaxy();
+
+    BOOST_CHECK_EQUAL(g.size() * (g.size() - 1) / 2, num_edges(g));
+    
+    auto e = edges(g);
+    std::vector<Jump> edge_vec(e.first, e.second);
+    
+    BOOST_CHECK_EQUAL(edge_vec.size(), num_edges(g));
+}
+
 SC_TEST_CASE(StarMapTests, TestNearestNeighbor)
 {
     StarMap g = basicGalaxy();

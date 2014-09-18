@@ -11,7 +11,9 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/function_input_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <pairs_iterator.hpp>
 
 namespace StellarCartography
 {
@@ -97,6 +99,7 @@ public:
     typedef boost::disallow_parallel_edge_tag edge_parallel_category;
     struct traversal_category : 
         public virtual boost::vertex_list_graph_tag,
+        public virtual boost::edge_list_graph_tag,
         public virtual boost::incidence_graph_tag
     { };
 
@@ -118,14 +121,19 @@ public:
     typedef size_type degree_size_type;
 
     /**************************************************************************/
-    /* Adaptor for IncidenceGraph concept requirements with edges filtered by */
-    /* distance.                                                              */
+    /* Adaptor for IncidenceGraph and EdgeListGraph concept requirements with */
+    /**************************************************************************/
+    typedef size_type edges_size_type;
+    typedef pairs_iterator<vertex_iterator, Jump> edge_iterator;
+
+    /**************************************************************************/
+    /* Adaptor for IncidenceGraph and EdgeListGraph concept requirements with */
+    /* edges filtered by distance.                                            */
     /**************************************************************************/
     struct ByDistance 
     {
         /* todo */
     };
-
 
     /**************************************************************************/
     /* Container views.                                                       */
@@ -190,6 +198,12 @@ out_edges(const Star& u, const StarMap& g);
 
 StarMap::degree_size_type
 out_degree(const Star& u, const StarMap& g);
+
+std::pair<StarMap::edge_iterator,StarMap::edge_iterator>
+edges(const StarMap& g);
+
+StarMap::edges_size_type
+num_edges(const StarMap& g);
 
 template<class It>
 StarMap::StarMap(It begin, It end) : 
