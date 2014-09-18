@@ -32,4 +32,6 @@ install_manifest.txt
 *.out
 *.app
 
+*.pyc
+
 Contrib/
