@@ -130,11 +130,31 @@ public:
     typedef pairs_iterator<vertex_iterator, Jump> edge_iterator;
 
     /**************************************************************************/
-    /* Adaptor for IncidenceGraph and EdgeListGraph concept requirements with */
-    /* edges filtered by distance.                                            */
+    /* Adaptor for the various graph concept requirements with edges filtered */
+    /* by distance.                                                           */
     /**************************************************************************/
-    struct ByDistance 
+    class dist_index
     {
+        double t2_;
+        const StarMap *m_;
+    public:
+        dist_index(double t, const StarMap *m) :
+            t2_(t*t), m_(m)
+        { }
+
+        const StarMap& parent() const { return *m_; }
+ 
+        /* Graph concept */
+        typedef StarMap::vertex_descriptor vertex_descriptor;
+        typedef StarMap::edge_descriptor edge_descriptor;
+        typedef StarMap::directed_category directed_category;
+        typedef StarMap::edge_parallel_category edge_parallel_category;
+        typedef StarMap::traversal_category traversal_category;
+
+        /* VertexListGraph concept */
+        typedef StarMap::vertices_size_type vertices_size_type;
+        typedef StarMap::vertex_iterator vertex_iterator;
+
         /* todo */
     };
 
@@ -151,7 +171,8 @@ public:
     const coord_index& byCoordinate() const 
     { return stars_.get<CoordinateIndex>(); }
 
-    ByDistance byDistance(double threshold) const { return { }; }
+    dist_index byDistance(double threshold) const 
+    { return dist_index(threshold, this); }
 
     /**************************************************************************/
     /* Algorithms                                                             */
@@ -190,8 +211,17 @@ private:
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
 vertices(const StarMap& g);
 
+std::pair<
+    StarMap::dist_index::vertex_iterator,
+    StarMap::dist_index::vertex_iterator
+>
+vertices(const StarMap::dist_index& g);
+
 StarMap::vertices_size_type
 num_vertices(const StarMap& g);
+
+StarMap::dist_index::vertices_size_type
+num_vertices(const StarMap::dist_index& g);
 
 Star source(const Jump& j, const StarMap& g);
 Star target(const Jump& j, const StarMap& g);

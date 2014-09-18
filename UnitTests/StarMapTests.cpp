@@ -203,4 +203,21 @@ SC_TEST_CASE(StarMapTests, TestConnectedComponents)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(StarMapTests, TestByDistance)
+{
+    StarMap g = basicGalaxy();
+
+    auto d = g.byDistance(10.0);
+
+    BOOST_CHECK_EQUAL(num_vertices(g), num_vertices(d));
+    
+    auto v = vertices(d);
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        g.begin(), g.end(), 
+        v.first, v.second
+    );
+
+}
+SC_TEST_CASE_END()
+
 SC_TEST_SUITE_END()

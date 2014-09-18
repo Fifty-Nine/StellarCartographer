@@ -23,6 +23,9 @@ void concept_check [[gnu::unused]]()
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap>));
     BOOST_CONCEPT_ASSERT((EdgeListGraphConcept<StarMap>));
     BOOST_CONCEPT_ASSERT((IncidenceGraphConcept<StarMap>));
+
+    BOOST_CONCEPT_ASSERT((GraphConcept<StarMap::dist_index>));
+    BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap::dist_index>));
 }
 
 template<class T>
@@ -200,10 +203,23 @@ StellarCartography::vertices(const StarMap& g)
     return std::make_pair(g.begin(), g.end());
 }
 
+auto StellarCartography::vertices(const StarMap::dist_index& g)
+    -> decltype(vertices(g))
+{
+    return vertices(g.parent());
+}
+
 StarMap::vertices_size_type
 StellarCartography::num_vertices(const StarMap& g)
 {
     return g.size();
+}
+
+
+auto StellarCartography::num_vertices(const StarMap::dist_index& g)
+    -> decltype(num_vertices(g))
+{
+    return num_vertices(g.parent());
 }
 
 Star StellarCartography::source(const Jump& j, const StarMap&)
