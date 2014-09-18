@@ -21,6 +21,7 @@ public:
     double x() const { return v[0]; }
     double y() const { return v[1]; }
     double z() const { return v[2]; }
+    const double *data() const { return v; }
 
     double distanceSquared(const Coordinate& other) const;
     double distance(const Coordinate& other) const;

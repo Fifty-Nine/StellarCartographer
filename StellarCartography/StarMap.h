@@ -29,23 +29,26 @@ class StarMap
         indexed_by<
             random_access<>,
             ordered_unique<identity<Star>>,
-            hashed_unique<const_mem_fun<Star, std::string, &Star::getName>>
+            hashed_unique<const_mem_fun<Star, std::string, &Star::getName>>,
+            hashed_unique<const_mem_fun<Star, Coordinate, &Star::getCoords>>
         >
     > container_type;
 
-    typedef flann::Index<flann::L2<double>> spatial_type;
+    typedef flann::KDTreeSingleIndex<flann::L2<double>> spatial_type;
     typedef std::vector<double> spatial_storage_type;
     typedef flann::Matrix<double> matrix_type;
 
     enum { 
         SeqIndex = 0,
         NameSeqIndex = 1,
-        NameMapIndex = 2
+        NameMapIndex = 2,
+        CoordinateIndex = 3
     };
 
     typedef container_type::nth_index<SeqIndex>::type seq_index;
     typedef container_type::nth_index<NameSeqIndex>::type name_seq_index;
     typedef container_type::nth_index<NameMapIndex>::type name_map_index;
+    typedef container_type::nth_index<CoordinateIndex>::type coord_index;
 
 public:
     /**************************************************************************/
@@ -137,16 +140,15 @@ public:
     /**************************************************************************/
     /* Container views.                                                       */
     /**************************************************************************/
-    typedef seq_index ByIndex;
-    typedef name_seq_index BySortedIndex;
-    typedef name_map_index ByName;
-
-    const ByIndex& byIndex() const { return stars_.get<SeqIndex>(); }
+    const seq_index& byIndex() const { return stars_.get<SeqIndex>(); }
     
-    const BySortedIndex& bySortedIndex() const 
+    const name_seq_index& bySortedIndex() const 
     { return stars_.get<NameSeqIndex>(); }
 
-    const ByName& byName() const { return stars_.get<NameMapIndex>(); }
+    const name_map_index& byName() const { return stars_.get<NameMapIndex>(); }
+
+    const coord_index& byCoordinate() const 
+    { return stars_.get<CoordinateIndex>(); }
 
     ByDistance byDistance(double threshold) const { return { }; }
 
@@ -180,7 +182,7 @@ private:
 
     container_type stars_;
     spatial_storage_type  spatial_storage_;
-    spatial_type spatial_index_;
+    mutable spatial_type spatial_index_;
 };
 
 std::pair<StarMap::vertex_iterator,StarMap::vertex_iterator>
@@ -229,7 +231,7 @@ StarMap::StarMap(It begin, It end) :
     ),
     spatial_index_(
         matrix_type(spatial_storage_.data(), stars_.size(), 3),
-        flann::KDTreeIndexParams()
+        flann::KDTreeSingleIndexParams(10, true)
     )
 {
     spatial_index_.buildIndex();

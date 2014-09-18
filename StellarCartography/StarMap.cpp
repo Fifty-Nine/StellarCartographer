@@ -25,6 +25,17 @@ void concept_check [[gnu::unused]]()
     BOOST_CONCEPT_ASSERT((IncidenceGraphConcept<StarMap>));
 }
 
+template<class T>
+flann::Matrix<T> toMatrix(const T *value, int rows = 1, int dims = 1)
+{
+    return flann::Matrix<T>(const_cast<T*>(value), rows, dims);
+}
+
+flann::Matrix<double> toMatrix(const Coordinate *c)
+{
+    return flann::Matrix<double>(const_cast<double*>(c->data()), 1, 3);
+}
+
 }
 
 StarMap::StarMap() : 
@@ -52,22 +63,59 @@ Star StarMap::StarMap::getStar(const std::string& name) const
 
 Star StarMap::nearestNeighbor(const std::string& name, double threshold) const
 {
-    return Star();
+    return nearestNeighbor(getStar(name), threshold);
 }
 
 Star StarMap::nearestNeighbor(const Star& star, double threshold) const
 {
-    return Star();
+    auto c = star.getCoords();
+    int index[2] = { 0 };
+    double dist[2] = { 0 };
+    flann::Matrix<int> i = toMatrix(index);
+    flann::Matrix<double> d = toMatrix(dist);
+
+    spatial_index_.knnSearch(toMatrix(&c), i, d, 2, flann::SearchParams());
+
+    return (dist[1] < threshold*threshold) ? byIndex().at(index[1]) : Star();
 }
 
 StarSet StarMap::neighbors(const std::string& name, double threshold) const
 {
-    return StarSet();
+    return neighbors(getStar(name), threshold);
 }
 
 StarSet StarMap::neighbors(const Star& star, double threshold) const
 {
-    return StarSet();
+    auto c = star.getCoords();
+    std::vector<std::vector<int>> idx;
+    std::vector<std::vector<double>> dists;
+    double t2 = threshold * threshold;
+
+    spatial_index_.radiusSearch(
+        toMatrix(&c),
+        idx,
+        dists,
+        t2,
+        flann::SearchParams()
+    );
+
+    auto pred = [star](const Star& v)
+    {
+        return v != star;
+    };
+    auto xform = [this](int i)
+    {
+        return byIndex().at(i);
+    };
+    
+    /* lol, iterators */
+    auto xbegin = make_transform_iterator(idx.front().begin(), xform);
+    auto xend = make_transform_iterator(idx.front().end(), xform);
+
+    auto begin = make_filter_iterator(pred, xbegin, xend);
+    auto end = make_filter_iterator(pred, xend, xend);
+
+    return StarSet(begin, end);
 }
 
 StarList StarMap::path(
