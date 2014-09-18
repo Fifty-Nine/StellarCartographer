@@ -1,6 +1,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include <iostream>
 #include <functional>
 #include <boost/regex.hpp>
 #include <readline/readline.h>
