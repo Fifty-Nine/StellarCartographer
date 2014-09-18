@@ -27,19 +27,19 @@ SC_TEST_CASE(NeighborMapTests, TestBasic)
     nm.add(g);
     nm.add(h);
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { b, c, h }),
         nm.neighbors(a, 10.0)
     );
 
     BOOST_CHECK_THROW(nm.neighbors(a, 11.0), std::out_of_range);
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         StarSet(),
         nm.neighbors(a, 0.9)
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { f, g }),
         nm.neighbors(e, 3.0)
     );

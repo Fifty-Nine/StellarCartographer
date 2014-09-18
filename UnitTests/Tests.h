@@ -10,45 +10,24 @@
 #define SC_TEST_CASE(suite, name) BOOST_AUTO_TEST_CASE(name)
 #define SC_TEST_CASE_END()
 
-namespace boost 
-{
-namespace test_tools
+namespace StellarCartography
 {
 
-template<> 
-struct print_log_value<StellarCartography::Coordinate> 
-{
-    void operator()(std::ostream& os, const StellarCartography::Coordinate& c);
-};
-
-template<>
-struct print_log_value<StellarCartography::Star>
-{
-    void operator()(std::ostream& os, const StellarCartography::Star& c);
-};
-
-template<>
-struct print_log_value<StellarCartography::StarList>
-{
-    void operator()(
-        std::ostream& os, const StellarCartography::StarList& sl);
-};
-
-template<>
-struct print_log_value<StellarCartography::StarSet>
-{
-    void operator()(
-        std::ostream& os, const StellarCartography::StarSet& sl);
-};
-
-template<>
-struct print_log_value<std::list<StellarCartography::StarSet>>
-{
-    void operator()(
-        std::ostream& os, const std::list<StellarCartography::StarSet>& sl);
-};
+std::ostream& operator<<(
+    std::ostream& os, const StellarCartography::Coordinate& c);
+std::ostream& operator<<(
+    std::ostream& os, const StellarCartography::Star& c);
 
 }
-}
+
+#define SC_CHECK_EQUAL_COLLECTIONS(exp, act) \
+do { \
+    auto actv = (act); \
+    auto expv = (exp); \
+    BOOST_CHECK_EQUAL_COLLECTIONS( \
+        expv.begin(), expv.end(), \
+        actv.begin(), actv.end() \
+    ); \
+} while(0)
 
 #endif /* TESTS_H */

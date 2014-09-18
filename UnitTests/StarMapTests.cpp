@@ -97,17 +97,17 @@ SC_TEST_CASE(StarMapTests, TestNeighbors)
 {
     StarMap g = basicGalaxy();
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { polaris(), proximaCentauri() }),
         (g.neighbors(sol(), 6.0))
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         StarSet(),
         (g.neighbors(sol().getName(), 1.0))
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { alphaCentauri() }),
         (g.neighbors(betaCanisMajoris(), 7))
     );
@@ -117,12 +117,12 @@ SC_TEST_CASE(StarMapTests, TestPath)
 {
     StarMap g = basicGalaxy();
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarList { sol(), proximaCentauri() }),
         (g.path(sol(), proximaCentauri(), 5))
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarList { sol(), proximaCentauri(), alphaCentauri(), betaCanisMajoris() }),
         (g.path(sol().getName(), betaCanisMajoris().getName(), 10))
     );
@@ -144,17 +144,17 @@ SC_TEST_CASE(StarMapTests, TestRoutingWeight)
     StarMap g { a, b, c, d, e };
 
     
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarList { a, e, d }),
         (g.path(a, d, 1.99))
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarList { a, d }),
         (g.path(a, d, 4.0))
     );
     
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarList { a, b, c, d }),
         (g.path(a, d, 1.1))
     );
@@ -165,17 +165,17 @@ SC_TEST_CASE(StarMapTests, TestReachable)
 {
     StarMap g = basicGalaxy();
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { sol(), proximaCentauri(), polaris() }),
         g.reachable(sol(), 5.1)
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { alphaCentauri(), betaCanisMajoris() }),
         (g.reachable(alphaCentauri().getName(), 7.0))
     );
 
-    BOOST_CHECK_EQUAL(
+    SC_CHECK_EQUAL_COLLECTIONS(
         (StarSet { alphaCentauri(), betaCanisMajoris() }),
         (g.reachable(betaCanisMajoris(), 7.0))
     );
@@ -185,18 +185,21 @@ SC_TEST_CASE_END()
 SC_TEST_CASE(StarMapTests, TestConnectedComponents)
 {
     StarMap g = basicGalaxy();
+    auto exp = std::list<StarSet>
+    {
+        { alphaCentauri(), betaCanisMajoris() },
+        { sol(), proximaCentauri(), polaris() },
+        { sirius() }
+    };
+    auto act = g.connectedComponents(7.0);
 
-    BOOST_CHECK_EQUAL(
-        (
-            std::list<StarSet> 
-            {
-                { alphaCentauri(), betaCanisMajoris() },
-                { sol(), proximaCentauri(), polaris() },
-                { sirius() }
-            }
-        ),
-        g.connectedComponents(7.0)
-    );
+    BOOST_REQUIRE_EQUAL(exp.size(), act.size());
+    auto it = exp.begin();
+    auto jt = act.begin();
+    for (; it != exp.end() && jt != act.end(); ++it, ++jt)
+    {
+        SC_CHECK_EQUAL_COLLECTIONS(*it, *jt);
+    }
 }
 SC_TEST_CASE_END()
 
