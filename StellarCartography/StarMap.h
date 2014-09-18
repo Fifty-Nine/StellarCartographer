@@ -65,17 +65,14 @@ public:
     typedef typename seq_index::const_reference const_reference;
     typedef typename seq_index::pointer pointer;
     typedef typename seq_index::const_pointer const_pointer;
-    typedef typename seq_index::iterator iterator;
+    typedef typename seq_index::const_iterator iterator;
     typedef typename seq_index::const_iterator const_iterator;
-    typedef typename seq_index::reverse_iterator reverse_iterator;
+    typedef typename seq_index::const_reverse_iterator reverse_iterator;
     typedef typename seq_index::const_reverse_iterator const_reverse_iterator;
     typedef typename seq_index::difference_type difference_type;
     typedef typename seq_index::size_type size_type;
 
-    iterator begin() { return byIndex().begin(); }
     const_iterator begin() const { return byIndex().begin(); }
-
-    iterator end() { return byIndex().end(); }
     const_iterator end() const { return byIndex().end(); }
     
     const Star& operator[](size_type n) const { return byIndex()[n]; }
@@ -84,10 +81,7 @@ public:
     size_type max_size() const { return byIndex().max_size(); }
     bool empty() const { return byIndex().empty(); }
         
-    reverse_iterator rbegin() { return byIndex().rbegin(); }
     const_reverse_iterator rbegin() const { return byIndex().rbegin(); }
-
-    reverse_iterator rend() { return byIndex().rend(); }
     const_reverse_iterator rend() const { return byIndex().rend(); }
 
     /**************************************************************************/
@@ -142,18 +136,13 @@ public:
     typedef name_seq_index BySortedIndex;
     typedef name_map_index ByName;
 
-    ByIndex& byIndex() { return stars_.get<SeqIndex>(); }
     const ByIndex& byIndex() const { return stars_.get<SeqIndex>(); }
     
-    BySortedIndex& bySortedIndex() 
-    { return stars_.get<NameSeqIndex>(); }
     const BySortedIndex& bySortedIndex() const 
     { return stars_.get<NameSeqIndex>(); }
 
-    ByName& byName() { return stars_.get<NameMapIndex>(); }
     const ByName& byName() const { return stars_.get<NameMapIndex>(); }
 
-    ByDistance byDistance(double threshold) { return { }; }
     ByDistance byDistance(double threshold) const { return { }; }
 
     /**************************************************************************/
