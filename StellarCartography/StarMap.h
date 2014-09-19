@@ -134,6 +134,16 @@ public:
     typedef pairs_iterator<vertex_iterator, Jump> edge_iterator;
 
     /**************************************************************************/
+    /* PropertyGraph(Star, vertex_index_t) concept requirements.              */
+    /**************************************************************************/
+    typedef std::function<size_type(vertex_descriptor)> vertex_index_fcn;
+    typedef function_property_map<
+        vertex_index_fcn, 
+        vertex_descriptor, 
+        size_type
+    > vertex_index_map;
+
+    /**************************************************************************/
     /* Adaptor for the various graph concept requirements with edges filtered */
     /* by distance.                                                           */
     /**************************************************************************/
@@ -176,20 +186,16 @@ public:
         typedef edge_map::value_type::second_type::const_iterator 
             out_edge_iterator;
         typedef edge_map::value_type::second_type::size_type degree_size_type;
-    
+
+        /* PropertyGraph(Star, vertex_index_t) concept */
+        typedef StarMap::vertex_index_map vertex_index_map;
+
     private:
         edge_container edges_;
         edge_map neighbors_;
 
         void init();
     };
-
-    typedef std::function<size_type(vertex_descriptor)> vertex_index_fcn;
-    typedef function_property_map<
-        vertex_index_fcn, 
-        vertex_descriptor, 
-        size_type
-    > vertex_index_map;
 
     /**************************************************************************/
     /* Container views.                                                       */
@@ -299,6 +305,14 @@ StarMap::vertex_index_map get(vertex_index_t, const StarMap& g);
 StarMap::size_type get(
     vertex_index_t, const StarMap& g, const StarMap::vertex_descriptor& x);
 
+StarMap::dist_index::vertex_index_map 
+get(vertex_index_t, const StarMap::dist_index& g);
+
+StarMap::dist_index::vertices_size_type get(
+    vertex_index_t, 
+    const StarMap::dist_index& g, 
+    const StarMap::dist_index::vertex_descriptor& x);
+
 template<class It>
 auto StarMap::initSpatialStorage(It begin, It end)
     -> spatial_storage_type
@@ -336,6 +350,13 @@ struct property_map<StellarCartography::StarMap, vertex_index_t>
 { 
     typedef StellarCartography::StarMap::vertex_index_map type;
     typedef StellarCartography::StarMap::vertex_index_map const_type;
+};
+
+template<>
+struct property_map<StellarCartography::StarMap::dist_index, vertex_index_t> 
+{ 
+    typedef StellarCartography::StarMap::dist_index::vertex_index_map type;
+    typedef StellarCartography::StarMap::dist_index::vertex_index_map const_type;
 };
 
 }

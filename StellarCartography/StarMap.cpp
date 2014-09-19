@@ -45,6 +45,13 @@ void concept_check [[gnu::unused]]()
             vertex_index_t
         >
     ));
+    BOOST_CONCEPT_ASSERT((
+        ReadablePropertyGraphConcept<
+            StarMap::dist_index, 
+            StarMap::dist_index::vertex_descriptor,
+            vertex_index_t
+        >
+    ));
 }
 
 template<class T>
@@ -422,6 +429,22 @@ auto StellarCartography::get(vertex_index_t, const StarMap& g)
 auto StellarCartography::get(
     vertex_index_t p, const StarMap& g, const StarMap::vertex_descriptor& v)
     -> StarMap::size_type
+{
+    return get(get(p, g), v);
+}
+
+auto StellarCartography::get(
+    vertex_index_t p, const StarMap::dist_index& g)
+    -> decltype(get(p, g))
+{
+    return get(p, g.parent());
+}
+
+auto StellarCartography::get(
+    vertex_index_t p, 
+    const StarMap::dist_index& g, 
+    const StarMap::dist_index::vertex_descriptor& v)
+    -> decltype(get(p, g, v))
 {
     return get(get(p, g), v);
 }
