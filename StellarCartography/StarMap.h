@@ -218,6 +218,7 @@ public:
     /* Algorithms                                                             */
     /**************************************************************************/
     Star getStar(const std::string& name) const;
+    size_type getIndex(const Star& star) const;
     Star nearestNeighbor(const std::string& name, double threshold) const;
     Star nearestNeighbor(const Star& star, double threshold) const;
 

@@ -180,15 +180,10 @@ auto StarMap::byDistance(double d) const
 auto StarMap::vertexIndexMap() const
     -> vertex_index_map
 {
-    auto f = [this](const vertex_descriptor& v)
-    {
-        auto it = bySortedIndex().find(v);
-        return stars_.project<SeqIndex>(it) - byIndex().begin();
-    };
-    return vertex_index_map(f);
+    return { bind(&StarMap::getIndex, this, _1) };
 }
 
-Star StarMap::StarMap::getStar(const std::string& name) const
+Star StarMap::getStar(const std::string& name) const
 {
     auto it = byName().find(name);
     if (it == byName().end())
@@ -198,6 +193,13 @@ Star StarMap::StarMap::getStar(const std::string& name) const
         throw std::invalid_argument(os.str());
     }
     return *it;
+}
+
+auto StarMap::getIndex(const Star& v) const
+    -> size_type
+{
+    auto it = bySortedIndex().find(v);
+    return stars_.project<SeqIndex>(it) - byIndex().begin();
 }
 
 Star StarMap::nearestNeighbor(const std::string& name, double threshold) const
@@ -262,7 +264,7 @@ StarList StarMap::path(
     const std::string& to, 
     double threshold) const
 {
-    return StarList();
+    return path(getStar(from), getStar(to), threshold);
 }
 
 StarList StarMap::path(
@@ -270,7 +272,30 @@ StarList StarMap::path(
     const Star& to, 
     double threshold) const
 {
-    return StarList();
+    vector_property_map<Star, vertex_index_map> prev_pa(vertexIndexMap());
+
+    breadth_first_search(
+        byDistance(threshold),
+        from,
+        visitor(
+            make_bfs_visitor(
+                record_predecessors(prev_pa, on_tree_edge())
+            )
+        )
+    );
+
+    Star s = to;
+    StarList result;
+
+    while (s != from)
+    {
+        result.push_front(s);
+        s = prev_pa[s];
+    }
+
+    if (s == from) result.push_front(s);
+
+    return result;
 }
 
 StarSet StarMap::reachable(const std::string& name, double threshold) const
