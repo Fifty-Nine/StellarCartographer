@@ -7,15 +7,16 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include "StellarCartography/SpatialIndex.h"
+#include "StellarCartography/StarMap.h"
 
 using namespace StellarCartography;
 
 std::list<std::string> star_names;
-SpatialIndex g;
+StarMap g;
 
 void loadIndex()
 {
+    std::vector<Star> stars;
     std::ifstream is("/home/princet/Coordinates.csv");
 
     std::string line;
@@ -25,7 +26,7 @@ void loadIndex()
         std::vector<std::string> strs;
         boost::split(strs, line, boost::is_any_of(","));
         
-        g.insert(
+        stars.push_back(
             {
                 strs[0],
                 {
@@ -37,6 +38,8 @@ void loadIndex()
         );
         star_names.push_back(strs[0]);
     }
+
+    g = StarMap(stars.begin(), stars.end());
 }
 
 typedef std::vector<std::string> ArgList;
