@@ -2,6 +2,8 @@
 
 #include <boost/concept_check.hpp>
 #include <boost/graph/graph_concepts.hpp>
+#include <boost/graph/breadth_first_search.hpp>
+#include <boost/property_map/property_map.hpp>
 
 using namespace StellarCartography;
 using namespace boost;
@@ -28,6 +30,21 @@ void concept_check [[gnu::unused]]()
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap::dist_index>));
     BOOST_CONCEPT_ASSERT((EdgeListGraphConcept<StarMap::dist_index>));
     BOOST_CONCEPT_ASSERT((IncidenceGraphConcept<StarMap::dist_index>));
+
+    BOOST_CONCEPT_ASSERT((
+        ReadablePropertyMapConcept<
+            StarMap::vertex_index_map, 
+            StarMap::vertex_descriptor
+        >
+    ));
+
+    BOOST_CONCEPT_ASSERT((
+        ReadablePropertyGraphConcept<
+            StarMap, 
+            StarMap::vertex_descriptor,
+            vertex_index_t
+        >
+    ));
 }
 
 template<class T>
@@ -151,6 +168,17 @@ auto StarMap::byDistance(double d) const
     return (it != dist_index_cache_.end()) ? 
         it->second : 
         dist_index_cache_.emplace_hint(it, t2, dist_index(t2, this))->second;
+}
+
+auto StarMap::vertexIndexMap() const
+    -> vertex_index_map
+{
+    auto f = [this](const vertex_descriptor& v)
+    {
+        auto it = bySortedIndex().find(v);
+        return stars_.project<SeqIndex>(it) - byIndex().begin();
+    };
+    return vertex_index_map(f);
 }
 
 Star StarMap::StarMap::getStar(const std::string& name) const
@@ -383,4 +411,17 @@ auto StellarCartography::num_edges(const StarMap::dist_index& g)
     -> decltype(num_edges(g))
 {
     return g.edges().size();
+}
+
+auto StellarCartography::get(vertex_index_t, const StarMap& g)
+    -> decltype(get(vertex_index_t(), g))
+{
+    return g.vertexIndexMap();
+}
+
+auto StellarCartography::get(
+    vertex_index_t p, const StarMap& g, const StarMap::vertex_descriptor& v)
+    -> StarMap::size_type
+{
+    return get(get(p, g), v);
 }

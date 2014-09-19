@@ -6,14 +6,16 @@
 
 #include <boost/container/flat_map.hpp>
 #include <boost/graph/graph_traits.hpp>
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/mem_fun.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/random_access_index.hpp>
+#include <boost/graph/properties.hpp>
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/function_input_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/random_access_index.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/property_map/function_property_map.hpp>
 #include <flann/flann.hpp>
 #include <pairs_iterator.hpp>
 #include <unordered_map>
@@ -42,10 +44,10 @@ class StarMap
     typedef flann::Matrix<double> matrix_type;
 
     enum { 
-        SeqIndex = 0,
-        NameSeqIndex = 1,
-        NameMapIndex = 2,
-        CoordinateIndex = 3
+        SeqIndex,
+        NameSeqIndex,
+        NameMapIndex,
+        CoordinateIndex
     };
 
     typedef container_type::nth_index<SeqIndex>::type seq_index;
@@ -182,6 +184,13 @@ public:
         void init();
     };
 
+    typedef std::function<size_type(vertex_descriptor)> vertex_index_fcn;
+    typedef function_property_map<
+        vertex_index_fcn, 
+        vertex_descriptor, 
+        size_type
+    > vertex_index_map;
+
     /**************************************************************************/
     /* Container views.                                                       */
     /**************************************************************************/
@@ -196,6 +205,8 @@ public:
     { return stars_.get<CoordinateIndex>(); }
 
     const dist_index& byDistance(double threshold) const; 
+
+    vertex_index_map vertexIndexMap() const; 
 
     /**************************************************************************/
     /* Algorithms                                                             */
@@ -284,6 +295,10 @@ edges(const StarMap::dist_index& g);
 StarMap::dist_index::edges_size_type
 num_edges(const StarMap::dist_index& g);
 
+StarMap::vertex_index_map get(vertex_index_t, const StarMap& g);
+StarMap::size_type get(
+    vertex_index_t, const StarMap& g, const StarMap::vertex_descriptor& x);
+
 template<class It>
 auto StarMap::initSpatialStorage(It begin, It end)
     -> spatial_storage_type
@@ -312,5 +327,17 @@ StarMap::StarMap(It begin, It end) :
 }
 
 } /* namespace StellarCartography */
+
+namespace boost
+{
+
+template<>
+struct property_map<StellarCartography::StarMap, vertex_index_t> 
+{ 
+    typedef StellarCartography::StarMap::vertex_index_map type;
+    typedef StellarCartography::StarMap::vertex_index_map const_type;
+};
+
+}
 
 #endif /* SC_STAR_MAP_H */
