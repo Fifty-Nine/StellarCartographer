@@ -1,6 +1,7 @@
 #ifndef SC_JUMP_H
 #define SC_JUMP_H
 
+#include <boost/container/flat_set.hpp>
 #include <boost/operators.hpp>
 
 #include "StellarCartography/Star.h"
@@ -30,6 +31,7 @@ public:
 };
 
 typedef std::list<Jump> JumpList;
+typedef boost::container::flat_set<Jump> JumpSet;
 
 } /* namespace StellarCartopgraphy */
 

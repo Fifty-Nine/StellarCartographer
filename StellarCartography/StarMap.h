@@ -140,7 +140,9 @@ public:
         double t2_;
         const StarMap *m_;
 
-        typedef std::vector<Jump> edge_container;
+        typedef JumpSet edge_container;
+        typedef std::unordered_map<Star, edge_container> edge_map;
+
     public:
         dist_index(double t2, const StarMap *m) :
             t2_(t2), m_(m)
@@ -151,6 +153,7 @@ public:
         const StarMap& parent() const { return *m_; }
 
         const edge_container& edges() const { return edges_; }
+        const edge_container& neighbors(const Star& s) const;
  
         /* Graph concept */
         typedef StarMap::vertex_descriptor vertex_descriptor;
@@ -166,10 +169,15 @@ public:
         /* EdgeListGraph concept */
         typedef edge_container::size_type edges_size_type;
         typedef edge_container::const_iterator edge_iterator;
+
+        /* IncidenceGraph concept */
+        typedef edge_map::value_type::second_type::const_iterator 
+            out_edge_iterator;
+        typedef edge_map::value_type::second_type::size_type degree_size_type;
     
     private:
         edge_container edges_;
-
+        edge_map neighbors_;
 
         void init();
     };
@@ -251,6 +259,15 @@ out_edges(const Star& u, const StarMap& g);
 
 StarMap::degree_size_type
 out_degree(const Star& u, const StarMap& g);
+
+std::pair<
+    StarMap::dist_index::out_edge_iterator,
+    StarMap::dist_index::out_edge_iterator
+>
+out_edges(const Star& u, const StarMap::dist_index& g);
+
+StarMap::dist_index::degree_size_type
+out_degree(const Star& u, const StarMap::dist_index& g);
 
 std::pair<StarMap::edge_iterator,StarMap::edge_iterator>
 edges(const StarMap& g);

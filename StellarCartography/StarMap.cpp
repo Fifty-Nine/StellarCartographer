@@ -27,6 +27,7 @@ void concept_check [[gnu::unused]]()
     BOOST_CONCEPT_ASSERT((GraphConcept<StarMap::dist_index>));
     BOOST_CONCEPT_ASSERT((VertexListGraphConcept<StarMap::dist_index>));
     BOOST_CONCEPT_ASSERT((EdgeListGraphConcept<StarMap::dist_index>));
+    BOOST_CONCEPT_ASSERT((IncidenceGraphConcept<StarMap::dist_index>));
 }
 
 template<class T>
@@ -116,9 +117,29 @@ void StarMap::dist_index::init()
         {
             size_t to = r[j]; 
 
-            if (to > from) edges_.emplace_back((*m_)[from], (*m_)[to]);
+            if (to > from) edges_.emplace((*m_)[from], (*m_)[to]);
         }
     }
+
+    for (auto j : edges_)
+    {
+        neighbors_[j.source()].emplace(j.source(), j.target());
+        neighbors_[j.target()].emplace(j.target(), j.source());
+    }
+}
+
+auto StarMap::dist_index::neighbors(const Star& s) const
+    -> decltype(neighbors(s))
+{
+    auto it = neighbors_.find(s);
+    if (it == neighbors_.end())
+    {
+        std::ostringstream ss;
+        ss << "Star " << s.getName() << "not in graph.";
+        throw std::invalid_argument(ss.str());
+    }
+
+    return it->second;
 }
 
 auto StarMap::byDistance(double d) const
@@ -321,6 +342,19 @@ StarMap::degree_size_type
 StellarCartography::out_degree(const Star& u, const StarMap& g)
 {
     return g.size() - 1; 
+}
+
+auto StellarCartography::out_edges(const Star& u, const StarMap::dist_index& g)
+    -> decltype(out_edges(u, g ))
+{
+    auto& n = g.neighbors(u);
+    return { n.begin(), n.end() };
+}
+
+auto StellarCartography::out_degree(const Star& u, const StarMap::dist_index& g)
+    -> decltype(out_degree(u, g))
+{
+    return g.neighbors(u).size();
 }
 
 std::pair<StarMap::edge_iterator, StarMap::edge_iterator>

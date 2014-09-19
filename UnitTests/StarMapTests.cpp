@@ -231,7 +231,7 @@ SC_TEST_CASE(StarMapTests, TestEdges)
     StarMap g { a, b, c, d };
     auto idx = g.byDistance(1.1);
 
-    std::vector<Jump> e(edges(idx).first, edges(idx).second);
+    JumpSet e(edges(idx).first, edges(idx).second);
 
     BOOST_CHECK_EQUAL(4, num_edges(idx));
     BOOST_REQUIRE_EQUAL(e.size(), num_edges(idx));
@@ -242,14 +242,33 @@ SC_TEST_CASE(StarMapTests, TestEdges)
 
     auto idx2 = g.byDistance(2);
 
-    auto g_edges = std::vector<Jump>(edges(g).first, edges(g).second);
-    e = std::vector<Jump>(edges(idx2).first, edges(idx2).second);
-
-    sort(e.begin(), e.end());
+    auto g_edges = JumpSet(edges(g).first, edges(g).second);
+    e = JumpSet(edges(idx2).first, edges(idx2).second);
 
     BOOST_CHECK_EQUAL(num_edges(g), num_edges(idx2));
     SC_CHECK_EQUAL_COLLECTIONS(g_edges, e);
-    
+
+    BOOST_CHECK_EQUAL(2, out_degree(a, idx));
+    BOOST_CHECK_EQUAL(2, out_degree(b, idx));
+    BOOST_CHECK_EQUAL(2, out_degree(c, idx));
+    BOOST_CHECK_EQUAL(2, out_degree(d, idx));
+
+    BOOST_CHECK_EQUAL(3, out_degree(a, idx2));
+    BOOST_CHECK_EQUAL(3, out_degree(b, idx2));
+    BOOST_CHECK_EQUAL(3, out_degree(c, idx2));
+    BOOST_CHECK_EQUAL(3, out_degree(d, idx2));
+
+    auto a_out = JumpSet(out_edges(a, idx).first, out_edges(a, idx).second);
+    SC_CHECK_EQUAL_COLLECTIONS(
+        (JumpList { { a, b }, { a, c } }),
+        a_out
+    );
+
+    a_out = JumpSet(out_edges(a, idx2).first, out_edges(a, idx2).second);
+    SC_CHECK_EQUAL_COLLECTIONS(
+        (JumpList { { a, b }, { a, c }, { a, d } }),
+        a_out
+    );
 }
 SC_TEST_CASE_END()
 
