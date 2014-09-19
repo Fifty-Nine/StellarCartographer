@@ -3,7 +3,6 @@ SET(SOURCES
     Jump.cpp
     NeighborMap.cpp
     NeighborMapGraphTraits.cpp
-    SpatialIndex.cpp
     Star.cpp
     StarMap.cpp
 )
@@ -14,7 +13,6 @@ SET(HEADERS
     Jump.h
     NeighborMap.h
     NeighborMapGraphTraits.h
-    SpatialIndex.h
     Star.h
     StarMap.h
 )
