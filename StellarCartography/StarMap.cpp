@@ -275,12 +275,27 @@ StarList StarMap::path(
 
 StarSet StarMap::reachable(const std::string& name, double threshold) const
 {
-    return StarSet();
+    return reachable(getStar(name), threshold);
 }
 
 StarSet StarMap::reachable(const Star& star, double threshold) const
 {
-    return StarSet();
+    StarSet result;
+    breadth_first_search(
+        byDistance(threshold),
+        star,
+        visitor(
+            make_bfs_visitor(
+                write_property(
+                    typed_identity_property_map<Star>(),
+                    inserter(result, result.begin()), 
+                    on_discover_vertex()
+                )
+            )
+        )
+    );
+
+    return result; 
 }
 
 std::list<StarSet> StarMap::connectedComponents(double threshold) const
