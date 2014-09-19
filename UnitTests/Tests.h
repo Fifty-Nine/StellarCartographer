@@ -17,6 +17,8 @@ std::ostream& operator<<(
     std::ostream& os, const StellarCartography::Coordinate& c);
 std::ostream& operator<<(
     std::ostream& os, const StellarCartography::Star& c);
+std::ostream& operator<<(
+    std::ostream& os, const StellarCartography::Jump& c);
 
 }
 

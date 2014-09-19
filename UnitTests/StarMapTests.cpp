@@ -220,4 +220,37 @@ SC_TEST_CASE(StarMapTests, TestByDistance)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(StarMapTests, TestEdges)
+{
+    Star 
+        a { "a", { 0.0, 0.0, 0.0 } },
+        b { "b", { 1.0, 0.0, 0.0 } },
+        c { "c", { 0.0, 1.0, 0.0 } },
+        d { "d", { 1.0, 1.0, 0.0 } };
+
+    StarMap g { a, b, c, d };
+    auto idx = g.byDistance(1.1);
+
+    std::vector<Jump> e(edges(idx).first, edges(idx).second);
+
+    BOOST_CHECK_EQUAL(4, num_edges(idx));
+    BOOST_REQUIRE_EQUAL(e.size(), num_edges(idx));
+    SC_CHECK_EQUAL_COLLECTIONS(
+        (JumpList { { a, b }, { a, c }, { b, d }, { c, d } }), 
+        e
+    );
+
+    auto idx2 = g.byDistance(2);
+
+    auto g_edges = std::vector<Jump>(edges(g).first, edges(g).second);
+    e = std::vector<Jump>(edges(idx2).first, edges(idx2).second);
+
+    sort(e.begin(), e.end());
+
+    BOOST_CHECK_EQUAL(num_edges(g), num_edges(idx2));
+    SC_CHECK_EQUAL_COLLECTIONS(g_edges, e);
+    
+}
+SC_TEST_CASE_END()
+
 SC_TEST_SUITE_END()

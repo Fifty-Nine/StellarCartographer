@@ -16,6 +16,7 @@
 #include <boost/iterator/transform_iterator.hpp>
 #include <flann/flann.hpp>
 #include <pairs_iterator.hpp>
+#include <unordered_map>
 
 namespace StellarCartography
 {
@@ -138,12 +139,18 @@ public:
     {
         double t2_;
         const StarMap *m_;
+
+        typedef std::vector<Jump> edge_container;
     public:
         dist_index(double t2, const StarMap *m) :
             t2_(t2), m_(m)
-        { }
+        { 
+            init(); 
+        }
 
         const StarMap& parent() const { return *m_; }
+
+        const edge_container& edges() const { return edges_; }
  
         /* Graph concept */
         typedef StarMap::vertex_descriptor vertex_descriptor;
@@ -157,10 +164,14 @@ public:
         typedef StarMap::vertex_iterator vertex_iterator;
 
         /* EdgeListGraph concept */
-        typedef StarMap::size_type edges_size_type;
-        typedef /*todo*/ Jump* edge_iterator;
+        typedef edge_container::size_type edges_size_type;
+        typedef edge_container::const_iterator edge_iterator;
+    
+    private:
+        edge_container edges_;
 
-        /* todo */
+
+        void init();
     };
 
     /**************************************************************************/

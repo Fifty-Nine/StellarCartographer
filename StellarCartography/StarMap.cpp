@@ -86,6 +86,41 @@ StarMap& StarMap::operator=(StarMap&& m)
     return *this;
 }
 
+void StarMap::dist_index::init()
+{
+    std::vector<double> c(m_->size() * 3);
+
+    auto p = c.data();
+    for (auto v : *m_)
+    {
+        Coordinate c(v.getCoords());
+        std::copy(c.data(), c.data() + 3, p);
+        p += 3;
+    }
+
+    std::vector<std::vector<int>> idx;
+    std::vector<std::vector<double>> dists;
+
+    m_->spatial_index_->radiusSearch(
+        matrix_type(c.data(), m_->size(), 3),
+        idx,
+        dists,
+        t2_,
+        flann::SearchParams()
+    );
+
+    for (size_t from = 0; from < idx.size(); ++from)
+    {
+        auto& r = idx[from];
+        for (size_t j = 0; j < r.size(); ++j)
+        {
+            size_t to = r[j]; 
+
+            if (to > from) edges_.emplace_back((*m_)[from], (*m_)[to]);
+        }
+    }
+}
+
 auto StarMap::byDistance(double d) const
     -> decltype(byDistance(0.0))
 {
@@ -307,11 +342,11 @@ StellarCartography::num_edges(const StarMap& g)
 auto StellarCartography::edges(const StarMap::dist_index& g)
     -> decltype(edges(g))
 {
-    return { 0, 0 };
+    return { g.edges().begin(), g.edges().end() };
 }
 
 auto StellarCartography::num_edges(const StarMap::dist_index& g)
     -> decltype(num_edges(g))
 {
-    return 0;
+    return g.edges().size();
 }

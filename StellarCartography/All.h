@@ -2,6 +2,7 @@
 #define SC_ALL_H
 
 #include "StellarCartography/Coordinate.h"
+#include "StellarCartography/Jump.h"
 #include "StellarCartography/Star.h"
 #include "StellarCartography/SpatialIndex.h"
 
