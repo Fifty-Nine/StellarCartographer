@@ -185,10 +185,10 @@ SC_TEST_CASE_END()
 SC_TEST_CASE(StarMapTests, TestConnectedComponents)
 {
     StarMap g = basicGalaxy();
-    auto exp = std::list<StarSet>
+    auto exp = std::vector<StarSet>
     {
-        { alphaCentauri(), betaCanisMajoris() },
         { sol(), proximaCentauri(), polaris() },
+        { alphaCentauri(), betaCanisMajoris() },
         { sirius() }
     };
     auto act = g.connectedComponents(7.0);

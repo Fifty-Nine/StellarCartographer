@@ -3,6 +3,7 @@
 #include <boost/concept_check.hpp>
 #include <boost/graph/graph_concepts.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/connected_components.hpp>
 #include <boost/property_map/property_map.hpp>
 
 using namespace StellarCartography;
@@ -118,6 +119,7 @@ void StarMap::dist_index::init()
     auto p = c.data();
     for (auto v : *m_)
     {
+        neighbors_[v] = JumpSet();
         Coordinate c(v.getCoords());
         std::copy(c.data(), c.data() + 3, p);
         p += 3;
@@ -159,7 +161,7 @@ auto StarMap::dist_index::neighbors(const Star& s) const
     if (it == neighbors_.end())
     {
         std::ostringstream ss;
-        ss << "Star " << s.getName() << "not in graph.";
+        ss << "Star " << s.getName() << " not in graph.";
         throw std::invalid_argument(ss.str());
     }
 
@@ -323,9 +325,25 @@ StarSet StarMap::reachable(const Star& star, double threshold) const
     return result; 
 }
 
-std::list<StarSet> StarMap::connectedComponents(double threshold) const
-{
-    return std::list<StarSet>();
+std::vector<StarSet> StarMap::connectedComponents(double threshold) const
+{ 
+    typedef std::vector<size_type> idx_vector;
+    idx_vector c(size());
+    iterator_property_map<idx_vector::iterator, vertex_index_map> 
+        pa(c.begin(), vertexIndexMap());
+
+    auto count = connected_components(byDistance(threshold), pa);
+
+    std::vector<StarSet> result(count);
+    for (size_type i = 0; i < c.size(); ++i)
+    {
+        Star s = byIndex().at(i);
+        size_type component = c[i];
+
+        result[component].insert(s);
+    }
+
+    return result;
 }
         
 auto StarMap::initIndex() 

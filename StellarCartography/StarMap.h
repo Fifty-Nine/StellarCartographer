@@ -110,6 +110,8 @@ public:
         public virtual boost::incidence_graph_tag
     { };
 
+    static Star null_vertex() { return Star(); }
+
     /**************************************************************************/
     /* VertexListGraph concept requirements.                                  */
     /**************************************************************************/
@@ -173,6 +175,8 @@ public:
         typedef StarMap::directed_category directed_category;
         typedef StarMap::edge_parallel_category edge_parallel_category;
         typedef StarMap::traversal_category traversal_category;
+    
+        static Star null_vertex() { return Star(); }
 
         /* VertexListGraph concept */
         typedef StarMap::vertices_size_type vertices_size_type;
@@ -237,7 +241,7 @@ public:
     StarSet reachable(const std::string& name, double threshold) const;
     StarSet reachable(const Star& star, double threshold) const;
 
-    std::list<StarSet> connectedComponents(double threshold) const;
+    std::vector<StarSet> connectedComponents(double threshold) const;
 
 private:
     typedef container::flat_map<double, dist_index> dist_index_cache;
