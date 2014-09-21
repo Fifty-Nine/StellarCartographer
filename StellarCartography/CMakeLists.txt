@@ -1,4 +1,5 @@
 SET(SOURCES
+    Algorithms.cpp
     Coordinate.cpp
     Jump.cpp
     NeighborMap.cpp
@@ -8,6 +9,7 @@ SET(SOURCES
 )
 
 SET(HEADERS
+    Algorithms.h
     All.h
     Coordinate.h
     Jump.h

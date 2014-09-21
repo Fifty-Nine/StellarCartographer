@@ -14,26 +14,26 @@ find_package(Boost
 
 include(ExternalProject)
 
-set(pairs_iterator_PREFIX ${StellarCartographer_BINARY_DIR}/Contrib)
-set(pairs_iterator_PREFIX ${StellarCartographer_BINARY_DIR}/Contrib)
-set(pairs_iterator_TMP_DIR ${pairs_iterator_PREFIX}/tmp)
-set(pairs_iterator_STAMP_DIR ${pairs_iterator_PREFIX}/src/pairs_iterator-stamp)
-set(pairs_iterator_DOWNLOAD_DIR ${pairs_iterator_PREFIX}/src)
-set(pairs_iterator_SOURCE_DIR ${pairs_iterator_PREFIX}/src/pairs_iterator)
-set(pairs_iterator_BINARY_DIR ${pairs_iterator_PREFIX}/src/pairs_iterator-build)
-set(pairs_iterator_INSTALL_DIR ${pairs_iterator_PREFIX})
+set(combinations_iterator_PREFIX ${StellarCartographer_BINARY_DIR}/Contrib)
+set(combinations_iterator_PREFIX ${StellarCartographer_BINARY_DIR}/Contrib)
+set(combinations_iterator_TMP_DIR ${combinations_iterator_PREFIX}/tmp)
+set(combinations_iterator_STAMP_DIR ${combinations_iterator_PREFIX}/src/combinations_iterator-stamp)
+set(combinations_iterator_DOWNLOAD_DIR ${combinations_iterator_PREFIX}/src)
+set(combinations_iterator_SOURCE_DIR ${combinations_iterator_PREFIX}/src/combinations_iterator)
+set(combinations_iterator_BINARY_DIR ${combinations_iterator_PREFIX}/src/combinations_iterator-build)
+set(combinations_iterator_INSTALL_DIR ${combinations_iterator_PREFIX})
 
-ExternalProject_Add(pairs_iterator
-    PREFIX ${pairs_iterator_PREFIX}
-    GIT_REPOSITORY https://github.com/Fifty-Nine/pairs_iterator.git
-    GIT_TAG 1691efc1b62f7751a26edeffd3967f3464a78df3
+ExternalProject_Add(combinations_iterator
+    PREFIX ${combinations_iterator_PREFIX}
+    GIT_REPOSITORY https://github.com/Fifty-Nine/combinations_iterator.git
+    GIT_TAG d5699645de8256858fce028982ee06ff78524aac
     INSTALL_COMMAND ""
 )
 
 include_directories(
     ${StellarCartographer_SOURCE_DIR} 
     ${Boost_INCLUDE_DIRS} 
-    ${pairs_iterator_SOURCE_DIR}
+    ${combinations_iterator_SOURCE_DIR}
 )
 
 add_compile_options("-std=c++11")

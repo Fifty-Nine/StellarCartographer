@@ -7,6 +7,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "StellarCartography/Algorithms.h"
 #include "StellarCartography/StarMap.h"
 
 using namespace StellarCartography;
@@ -53,6 +54,16 @@ T getArg(ArgList args, size_t idx)
 {
     if (idx >= args.size()) throw std::out_of_range("Missing argument");
     return lexical_cast<T>(args[idx]);
+}
+
+typedef std::pair<Coordinate, double> Sample;
+template<>
+Sample getArg(ArgList args, size_t idx)
+{
+    std::string name = getArg(args, idx);
+    double range = getArg<double>(args, idx + 1);
+
+    return Sample(g.getStar(name).getCoords(), range);
 }
 
 CommandTable cmds 
@@ -129,6 +140,40 @@ CommandTable cmds
                     cout << "\t" << v.getName() << endl;
                 }
             }
+        }
+    },
+    {
+        "trilaterate",
+        [](ArgList a)
+        {
+            std::list<Sample> samples;
+
+            for (size_t i = 1; i < a.size(); i += 2)
+            {
+                samples.emplace_back(getArg<Sample>(a, i));
+            }
+            
+            auto q = 
+                StellarCartography::trilaterate(samples.begin(), samples.end());
+            cout << q.x() << ", " << q.y() << ", " << q.z() << endl;
+        }
+    },
+    {
+        "coordinates",
+        [](ArgList a)
+        {
+            auto p = g.getStar(getArg(a, 1)).getCoords();
+            cout << "(" << p.x() << ", " << p.y() << ", " << p.z() << ")" << endl;
+        }
+    },
+    {
+        "distance",
+        [](ArgList a)
+        {
+            auto p1 = g.getStar(getArg(a, 1)).getCoords();
+            auto p2 = g.getStar(getArg(a, 2)).getCoords();
+
+            cout << p1.distance(p2) << endl;
         }
     }
 };
