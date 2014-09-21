@@ -178,9 +178,22 @@ CommandTable cmds
     }
 };
 
+std::string strip_comments(const std::string& s)
+{
+    bool in_quote = false;
+    std::string result;
+    for (char c : s)
+    {
+        if (c == '"' || c == '\'') in_quote = !in_quote;
+        if (c == '#' && !in_quote) break;
+        result.push_back(c);
+    }
+    return result;
+}
+
 std::vector<std::string> split_args(const std::string& s)
 {
-    boost::regex split_regex("(^|\\s+)('.*?'|[^\\s]+)");
+    boost::regex split_regex("(^|\\s+)('.*?'|\".*?\"|[^\\s]+)");
     std::vector<std::string> args;
 
     std::transform(
@@ -189,7 +202,7 @@ std::vector<std::string> split_args(const std::string& s)
         std::back_inserter(args),
         [](boost::smatch m) 
         { 
-            return boost::trim_copy_if(m.str(), boost::is_any_of(" \t'")); 
+            return boost::trim_copy_if(m.str(), boost::is_any_of(" \t'\"")); 
         }
     );
     return args;
@@ -197,7 +210,7 @@ std::vector<std::string> split_args(const std::string& s)
 
 void processQuery(const CommandTable& c, const std::string& cmd)
 {
-    std::vector<std::string> args = split_args(cmd);
+    std::vector<std::string> args = split_args(strip_comments(cmd));
     if (args.size() == 0) return;
 
     auto it = c.find(args[0]);
