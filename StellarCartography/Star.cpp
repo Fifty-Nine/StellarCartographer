@@ -41,6 +41,23 @@ int Star::compare(const Star& o) const
     return getCoords().compare(o.getCoords());
 }
 
+std::string Star::getProperty(const std::string& key) const
+{
+    auto it = props_.find(key);
+    if (it == props_.end()) 
+    {
+        std::ostringstream ss;
+        ss << "No such property: " << key;
+        throw std::invalid_argument(ss.str());
+    }
+    return it->second;
+}
+
+void Star::setProperty(const std::string& key, const std::string& value)
+{
+    props_[key] = value;
+}
+
 std::size_t std::hash<Star>::operator()(const Star& s) const
 {
     return std::hash<std::string>()(s.getName());  

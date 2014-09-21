@@ -6,6 +6,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #include "StellarCartography/Coordinate.h"
 
@@ -17,6 +18,9 @@ class Star :
 {
     std::string name_;
     Coordinate coords_;
+    typedef std::unordered_map<std::string, std::string> properties_type;
+    properties_type props_;
+
 public:
     Star() { }
     Star(const std::string& name, const Coordinate& coords) :
@@ -26,6 +30,11 @@ public:
 
     std::string getName() const { return name_; }
     Coordinate getCoords() const { return coords_; }
+
+    std::string getProperty(const std::string& key) const;
+    void setProperty(const std::string& key, const std::string& value);
+
+    const properties_type& properties() const { return props_; }
 
     bool operator==(const Star& s) const;
     bool operator<(const Star& s) const;
