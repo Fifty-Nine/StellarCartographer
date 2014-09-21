@@ -182,23 +182,53 @@ CommandTable cmds
         [](ArgList a)
         {
             auto d = getArg<double>(a, 1);
+            Coordinate com = g.centerOfMass();
+            double extent = g.extent();
+            double scale = 10.0 / extent;
 
             auto edge_writer = [](std::ostream& os, const Jump& edge)
             {
                 os << "[" 
-                   << "label=\"" << edge.weight() << "\"" 
+                   << "xlabel=\"" << fixed << setprecision(2) << edge.weight() << "\"" 
                    << "]";
             };
 
-            auto vertex_writer = [](std::ostream& os, const Star& s)
+            auto make_label = [](const Star& star)
             {
+                Coordinate c = star.getCoords();
+                ostringstream ss;
+                ss.precision(2);
+                ss << fixed;
+                ss << "<table border=\"0\" cellborder=\"0\">";
+                ss << "<tr><td colspan=\"2\">" << star.getName() << "</td></tr>";
+                ss << "<tr><td>X</td><td>" << c.x() << "</td></tr>";
+                ss << "<tr><td>Y</td><td>" << c.y() << "</td></tr>";
+                ss << "<tr><td>Z</td><td>" << c.z() << "</td></tr>";
+                ss << "</table>";
+                return ss.str();
+            };
+
+            auto vertex_writer = [com, scale, &make_label](
+                std::ostream& os, const Star& s)
+            {
+                Coordinate c = s.getCoords();
+                c = { (c.x() - com.x()) * scale, (c.y() - com.y()) * scale, 0.0 };
                 os << "[" 
-                   << "label=\"" << s.getName() << "\"" 
+                   << "fillcolor=\"white\" "
+                   << "label=<" << make_label(s) << "> "
+                   << "shape=box "
+                   << "style=\"rounded\" "
                    << "]";
+            };
+
+            auto graph_writer = [](std::ostream& os)
+            {
+                os << "overlap=scale" << endl;
+                os << "node [style=filled]" << endl;
             };
 
             boost::write_graphviz(
-                cout, g.byDistance(d), vertex_writer, edge_writer
+                cout, g.byDistance(d), vertex_writer, edge_writer, graph_writer
             );
         }
     }
