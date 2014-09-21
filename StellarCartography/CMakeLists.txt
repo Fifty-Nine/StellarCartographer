@@ -2,8 +2,6 @@ SET(SOURCES
     Algorithms.cpp
     Coordinate.cpp
     Jump.cpp
-    NeighborMap.cpp
-    NeighborMapGraphTraits.cpp
     Star.cpp
     StarMap.cpp
 )
@@ -13,8 +11,6 @@ SET(HEADERS
     All.h
     Coordinate.h
     Jump.h
-    NeighborMap.h
-    NeighborMapGraphTraits.h
     Star.h
     StarMap.h
 )
