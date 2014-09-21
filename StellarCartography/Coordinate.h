@@ -25,6 +25,7 @@ public:
 
     double distanceSquared(const Coordinate& other) const;
     double distance(const Coordinate& other) const;
+    double manhattanDistance(const Coordinate& other) const;
 
     bool operator==(const Coordinate& other) const;
     bool operator<(const Coordinate& other) const;

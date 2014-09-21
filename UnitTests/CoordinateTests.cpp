@@ -74,4 +74,31 @@ SC_TEST_CASE(CoordinateTests, TestOrder)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(CoordinateTests, TestManhattanDistance)
+{
+    Coordinate origin;
+    Coordinate a { 1, 0, 0 };
+    Coordinate b { 0, 1, 0 };
+    Coordinate c { 0, 0, 1 };
+    Coordinate d { 1, 2, 3 };
+
+    BOOST_CHECK_EQUAL(origin.manhattanDistance(origin), 0.0); 
+    BOOST_CHECK_EQUAL(a.manhattanDistance(a), 0.0);
+
+    BOOST_CHECK_EQUAL(origin.manhattanDistance(a), 1.0);
+    BOOST_CHECK_EQUAL(a.manhattanDistance(origin), 1.0);
+
+    BOOST_CHECK_EQUAL(a.manhattanDistance(b), 2.0);
+    BOOST_CHECK_EQUAL(b.manhattanDistance(a), 2.0);
+
+    BOOST_CHECK_EQUAL(b.manhattanDistance(c), 2.0);
+    BOOST_CHECK_EQUAL(c.manhattanDistance(b), 2.0);
+
+    BOOST_CHECK_EQUAL(origin.manhattanDistance(d), 6.0);
+    BOOST_CHECK_EQUAL(a.manhattanDistance(d), 5.0);
+    BOOST_CHECK_EQUAL(b.manhattanDistance(d), 5.0);
+    BOOST_CHECK_EQUAL(c.manhattanDistance(d), 5.0);
+}
+SC_TEST_CASE_END()
+
 SC_TEST_SUITE_END()

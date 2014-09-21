@@ -2,6 +2,7 @@
 
 #include <boost/concept_check.hpp>
 #include <cmath>
+#include <numeric>
 
 using namespace StellarCartography;
 using namespace boost;
@@ -34,18 +35,31 @@ Coordinate::Coordinate(double x, double y, double z) :
 
 double Coordinate::distanceSquared(const Coordinate& o) const
 {
-    double sum = 0;
-    for (int i = 0; i < 3; ++i)
-    {
-        double n = v[i] - o.v[i];
-        sum += n*n;
-    }
-    return sum;
+    return std::inner_product(
+        data(), data() + 3, o.data(), 0.0, 
+        std::plus<double>(),
+        [](double l, double r)
+        {
+            return (l - r) * (l - r);
+        }
+    );
 }
 
 double Coordinate::distance(const Coordinate& o) const
 {
     return std::sqrt(distanceSquared(o));
+}
+
+double Coordinate::manhattanDistance(const Coordinate& o) const
+{
+    return std::inner_product(
+        data(), data() + 3, o.data(), 0.0,
+        std::plus<double>(), 
+        [](double l, double r)
+        {
+            return std::abs(l - r);
+        }
+    );
 }
 
 bool Coordinate::operator==(const Coordinate& o) const
