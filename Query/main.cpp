@@ -1,4 +1,5 @@
 #include <boost/algorithm/string.hpp>
+#include <boost/graph/graphviz.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <iostream>
@@ -278,20 +279,40 @@ bool prompt(std::string& s)
 {
     using namespace std;
 
-    rl_completer_quote_characters = "'";
-    rl_filename_quote_characters = " ";
-    rl_filename_quoting_desired = 1;
-    rl_attempted_completion_function = &completer;
+    if (isatty(fileno(stdin)))
+    {
+        rl_completer_quote_characters = "'\"";
+        rl_filename_quote_characters = " ";
+        rl_filename_quoting_desired = 1;
+        rl_attempted_completion_function = &completer;
 
-    char *buf = readline("scq$ ");
+        char *buf = readline("scq$ ");
 
-    if (!buf) return false;
+        if (!buf) 
+        {
+            cout << endl;
+            return false;
+        }
 
-    s = std::string(buf);
-    add_history(buf);
-    free(buf);
+        s = std::string(buf);
+        add_history(buf);
+        free(buf);
+    
+        return true;
+    }
+    return std::getline(cin, s);
+}
 
-    return true;
+void redirect(const char *file)
+{
+    FILE* r = freopen(file, "r", stdin);
+
+    if (!r)
+    {
+        std::ostringstream ss;
+        ss << "Failed to redirect stdin: " << strerror(errno);
+        throw std::runtime_error(ss.str());
+    }
 }
 
 int main(int argc, char *argv[])
@@ -301,12 +322,28 @@ int main(int argc, char *argv[])
 
     loadIndex();
 
+    if (argc > 2)
+    {
+        std::cerr << "Too many command line arguments.";
+        return 1;
+    }
+    if (argc == 2)
+    {
+        try
+        {
+            redirect(argv[1]);
+        } 
+        catch (const std::exception& ex)
+        {
+            cerr << ex.what() << endl;
+        }
+    }
+
     while (true)
     {
         std::string cmd;
         if (!prompt(cmd))
         {
-            std::cout << std::endl;
             return 0;
         }
 
