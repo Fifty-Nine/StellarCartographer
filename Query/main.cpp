@@ -176,6 +176,31 @@ CommandTable cmds
 
             cout << p1.distance(p2) << endl;
         }
+    },
+    {
+        "map",
+        [](ArgList a)
+        {
+            auto d = getArg<double>(a, 1);
+
+            auto edge_writer = [](std::ostream& os, const Jump& edge)
+            {
+                os << "[" 
+                   << "label=\"" << edge.weight() << "\"" 
+                   << "]";
+            };
+
+            auto vertex_writer = [](std::ostream& os, const Star& s)
+            {
+                os << "[" 
+                   << "label=\"" << s.getName() << "\"" 
+                   << "]";
+            };
+
+            boost::write_graphviz(
+                cout, g.byDistance(d), vertex_writer, edge_writer
+            );
+        }
     }
 };
 
