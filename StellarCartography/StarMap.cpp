@@ -366,6 +366,26 @@ Coordinate StarMap::centerOfMass() const
         }
     );
 }
+
+double StarMap::extent() const
+{
+    Coordinate com = centerOfMass();
+
+    Coordinate c = std::max_element(
+        begin(), end(),
+        [com](Star ls, Star rs)
+        {
+            return ls.getCoords().manhattanDistance(com) 
+                < rs.getCoords().manhattanDistance(com);
+        }
+    )->getCoords();
+
+    return std::max({
+        std::abs(c.x() - com.x()),
+        std::abs(c.y() - com.y()),
+        std::abs(c.z() - com.z())
+    });
+}
         
 auto StarMap::initIndex() 
     -> spatial_ptr_type

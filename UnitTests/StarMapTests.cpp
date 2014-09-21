@@ -289,4 +289,17 @@ SC_TEST_CASE(StarMapTests, TestCenterOfMass)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(StarMapTests, TestExtent)
+{
+    StarMap g 
+    {
+        { "a", {  1.0,  1.0,  1.0 } },
+        { "b", {  2.0,  2.0,  2.0 } },
+        { "c", {  0.0,  1.0,  2.0 } },
+        { "d", { -2.0, -2.0, -2.0 } }
+    };
+
+    BOOST_CHECK_EQUAL(2.75, g.extent()); 
+}
+SC_TEST_CASE_END()
 SC_TEST_SUITE_END()

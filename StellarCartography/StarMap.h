@@ -243,6 +243,7 @@ public:
 
     std::vector<StarSet> connectedComponents(double threshold) const;
     Coordinate centerOfMass() const;
+    double extent() const;
 
 private:
     typedef container::flat_map<double, dist_index> dist_index_cache;
