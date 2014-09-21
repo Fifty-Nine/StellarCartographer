@@ -242,6 +242,7 @@ public:
     StarSet reachable(const Star& star, double threshold) const;
 
     std::vector<StarSet> connectedComponents(double threshold) const;
+    Coordinate centerOfMass() const;
 
 private:
     typedef container::flat_map<double, dist_index> dist_index_cache;

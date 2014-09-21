@@ -345,6 +345,27 @@ std::vector<StarSet> StarMap::connectedComponents(double threshold) const
 
     return result;
 }
+
+Coordinate StarMap::centerOfMass() const
+{
+    typedef container::flat_set<double> DimensionSet;
+
+    double sz = size();
+
+    return std::accumulate(
+        begin(), end(), 
+        Coordinate { 0, 0, 0 },
+        [sz](Coordinate l, Star rs)
+        {
+            Coordinate r = rs.getCoords(); 
+            return Coordinate { 
+                l.x() + r.x() / sz,
+                l.y() + r.y() / sz,
+                l.z() + r.z() / sz
+            };
+        }
+    );
+}
         
 auto StarMap::initIndex() 
     -> spatial_ptr_type

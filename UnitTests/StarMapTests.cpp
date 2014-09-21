@@ -272,4 +272,21 @@ SC_TEST_CASE(StarMapTests, TestEdges)
 }
 SC_TEST_CASE_END()
 
+SC_TEST_CASE(StarMapTests, TestCenterOfMass)
+{
+    StarMap g 
+    {
+        { "a", {  1.0,  1.0,  1.0 } },
+        { "b", {  2.0,  2.0,  2.0 } },
+        { "c", {  0.0,  1.0,  2.0 } },
+        { "d", { -2.0, -2.0, -2.0 } }
+    };
+
+    Coordinate exp = { 0.25, 0.5, 0.75 };
+    Coordinate act = g.centerOfMass();
+    
+    BOOST_CHECK_EQUAL(exp, act);
+}
+SC_TEST_CASE_END()
+
 SC_TEST_SUITE_END()
