@@ -16,33 +16,6 @@ using namespace StellarCartography;
 std::list<std::string> star_names;
 StarMap g;
 
-void loadIndex()
-{
-    std::vector<Star> stars;
-    std::ifstream is("/home/princet/Coordinates.csv");
-
-    std::string line;
-    while (std::getline(is, line).good())
-    {
-        boost::trim(line);
-        std::vector<std::string> strs;
-        boost::split(strs, line, boost::is_any_of(","));
-        
-        stars.push_back(
-            {
-                strs[0],
-                {
-                    boost::lexical_cast<double>(strs[1]),
-                    boost::lexical_cast<double>(strs[2]),
-                    boost::lexical_cast<double>(strs[3]),
-                }
-            }
-        );
-        star_names.push_back(strs[0]);
-    }
-
-    g = StarMap(stars.begin(), stars.end());
-}
 
 typedef std::vector<std::string> ArgList;
 typedef std::function<void (ArgList)> QueryFcn;
@@ -65,6 +38,14 @@ Sample getArg(ArgList args, size_t idx)
     double range = getArg<double>(args, idx + 1);
 
     return Sample(g.getStar(name).getCoords(), range);
+}
+
+std::ostream& operator<<(ostream& os, const Coordinate& c)
+{
+    std::ostringstream ss;
+    ss.precision(2);
+    ss << fixed << "(" << c.x() << ", " << c.y() << ", " << c.z() << ")";
+    return os << ss.str();
 }
 
 CommandTable cmds 
@@ -231,6 +212,88 @@ CommandTable cmds
                 cout, g.byDistance(d), vertex_writer, edge_writer, graph_writer
             );
         }
+    },
+    {
+        "load",
+        [](ArgList a)
+        {
+            std::vector<Star> stars;
+            std::ifstream is(getArg(a, 1));
+            star_names.clear();
+
+            std::string line;
+            while (std::getline(is, line).good())
+            {
+                boost::trim(line);
+                std::vector<std::string> strs;
+                boost::split(strs, line, boost::is_any_of(","));
+                
+                Star s {
+                    strs[0],
+                    {
+                        boost::lexical_cast<double>(strs[1]),
+                        boost::lexical_cast<double>(strs[2]),
+                        boost::lexical_cast<double>(strs[3]),
+                    }
+                };
+
+                s.setProperty("bloc", strs[4]);
+                s.setProperty("government", strs[5]);
+                s.setProperty("economy", strs[6]);
+
+                stars.push_back(s);
+                star_names.push_back(strs[0]);
+            }
+
+            g = StarMap(stars.begin(), stars.end());
+        }
+    },
+    {
+        "save",
+        [](ArgList a)
+        {
+            std::ofstream os(getArg(a, 1));
+
+            for (auto s : g)
+            {
+                auto c = s.getCoords();
+                os << s.getName() << "," 
+                   << fixed << setprecision(6)
+                   << c.x() << "," << c.y() << "," << c.z() << ","
+                   << s.getProperty("bloc") << ","
+                   << s.getProperty("government") << "," 
+                   << s.getProperty("economy") << endl;
+            }
+        }
+    },
+    {
+        "info",
+        [](ArgList a)
+        {
+            auto s = g.getStar(getArg(a, 1));
+
+            cout << "Name:         " << s.getName() << endl;
+            cout << "Location:     " << s.getCoords() << endl;
+
+            for (auto kv : s.properties())
+            {
+                std::ostringstream ss;
+                ss << left << kv.first << ":";
+                ss.width(std::max<int>(13 - kv.first.size(), 0));
+                ss << " ";
+                cout << ss.str() << kv.second << endl;
+            }
+        }
+    },
+    {
+        "list",
+        [](ArgList)
+        {
+            for (auto s : star_names)
+            {
+                cout << s << endl;
+            }
+        }
     }
 };
 
@@ -374,8 +437,6 @@ int main(int argc, char *argv[])
 {
     using namespace std;
     using namespace boost;
-
-    loadIndex();
 
     if (argc > 2)
     {
