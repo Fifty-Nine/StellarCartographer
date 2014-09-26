@@ -126,6 +126,11 @@ SC_TEST_CASE(StarMapTests, TestPath)
         (StarList { sol(), proximaCentauri(), alphaCentauri(), betaCanisMajoris() }),
         (g.path(sol().getName(), betaCanisMajoris().getName(), 10))
     );
+
+    SC_CHECK_EQUAL_COLLECTIONS(
+        (StarList { }),
+        (g.path(sol(), proximaCentauri(), 3.0))
+    );
 }
 
 SC_TEST_CASE(StarMapTests, TestRoutingWeight)

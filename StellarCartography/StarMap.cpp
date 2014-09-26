@@ -289,15 +289,13 @@ StarList StarMap::path(
     Star s = to;
     StarList result;
 
-    while (s != from)
+    do
     {
         result.push_front(s);
         s = prev_pa[s];
-    }
+    } while (s != Star());
 
-    if (s == from) result.push_front(s);
-
-    return result;
+    return (!result.empty() && result.front() == from) ? result : StarList();
 }
 
 StarSet StarMap::reachable(const std::string& name, double threshold) const
